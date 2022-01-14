@@ -1,0 +1,2 @@
+pub static APP_ID: &str = @APP_ID@;
+pub static PKGDATADIR: &str = @PKGDATADIR@;

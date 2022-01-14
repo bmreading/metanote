@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+    <gresource prefix="/com/github/bmreading/Metanote">
+        <file alias="window.ui">gtk/window.ui</file>
+        <file preprocess="xml-stripblanks">icons/music-queue-symbolic.svg</file>
+        <file preprocess="xml-stripblanks">icons/library-music-symbolic.svg</file>
+    </gresource>
+</gresources>

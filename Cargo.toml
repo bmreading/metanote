@@ -1,0 +1,13 @@
+[package]
+name = "metanote"
+authors = ["Brian Reading <brian.reading@gmail.com>"]
+description = "An audio metadata viewer and editor"
+license = 'GPL-3.0-or-later'
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+adw = { version = "0.1.0-beta-1", package = "libadwaita" }
+gio = "0.14.8"
+glib = "0.14.8"
+gtk = { version = "0.3.1", package = "gtk4" }
