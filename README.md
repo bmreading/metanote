@@ -19,7 +19,7 @@ Metanote is a metadata editor for audio file formats. It is primarily targeted f
 ```
 git clone https://github.com/bmreading/metanote.git
 cd metanote
-meson build --prefix=/usr build
+meson --prefix=/usr build
 ninja -C build
 sudo ninja -C install
 ```
