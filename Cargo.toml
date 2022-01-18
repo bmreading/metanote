@@ -7,7 +7,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-adw = { version = "0.1.0-beta-1", package = "libadwaita" }
-gio = "0.14.8"
-glib = "0.14.8"
-gtk = { version = "0.3.1", package = "gtk4" }
+adw = { version = "0.1.0", package = "libadwaita" }
+async-channel = "1.6.1"
+gio = "0.15.2"
+glib = "0.15.2"
+gtk = { version = "0.4.2", package = "gtk4" }
