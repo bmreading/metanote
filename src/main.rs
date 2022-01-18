@@ -17,15 +17,16 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
+mod app;
 mod config;
 mod window;
 
 use adw::prelude::*;
 
-use adw::Application;
-use gio::{ApplicationFlags, Resource};
+use gio::Resource;
 
-use config::{APP_ID, PKGDATADIR};
+use crate::app::MetanoteApplication;
+use crate::config::PKGDATADIR;
 
 fn main() {
     // Load and register resources
@@ -35,12 +36,8 @@ fn main() {
     .expect("Could not load resources");
     gio::resources_register(&resource);
 
-    let app = Application::new(Some(APP_ID), ApplicationFlags::empty());
+    let app = MetanoteApplication::new();
 
-    app.connect_activate(|app| {
-        let window = crate::window::MetanoteApplicationWindow::new(app);
-        window.present();
-    });
-
-    app.run();
+    let exit_status = app.run();
+    std::process::exit(exit_status)
 }
