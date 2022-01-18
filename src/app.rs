@@ -3,8 +3,8 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
-use glib::object_subclass;
 use gio::{ActionGroup, ActionMap};
+use glib::object_subclass;
 
 use crate::config::APP_ID;
 use crate::window::MetanoteApplicationWindow;

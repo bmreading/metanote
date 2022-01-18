@@ -30,14 +30,11 @@ use crate::config::PKGDATADIR;
 
 fn main() {
     // Load and register resources
-    let resource = Resource::load(
-        format!("{PKGDATADIR}/metanote.gresource"),
-    )
-    .expect("Could not load resources");
+    let resource = Resource::load(format!("{PKGDATADIR}/metanote.gresource"))
+        .expect("Could not load resources");
     gio::resources_register(&resource);
 
     let app = MetanoteApplication::new();
-
     let exit_status = app.run();
     std::process::exit(exit_status)
 }
