@@ -2,10 +2,12 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
-use adw::{Application, WindowTitle};
+use adw::WindowTitle;
 use glib::subclass::InitializingObject;
 use glib::Object;
 use gtk::{CompositeTemplate, ListBox};
+
+use crate::app::MetanoteApplication;
 
 mod imp {
     use super::*;
@@ -49,7 +51,7 @@ glib::wrapper! {
 }
 
 impl MetanoteApplicationWindow {
-    pub fn new(app: &Application) -> Self {
+    pub fn new(app: &MetanoteApplication) -> Self {
         Object::new(&[("application", app)]).expect("Failed to create Metanote window")
     }
 }
