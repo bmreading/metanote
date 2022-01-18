@@ -1,6 +1,7 @@
 .flatpak
 .flatpak-builder
 .vscode
+_build
 build
 config.rs
 target
