@@ -29,6 +29,9 @@ use crate::app::MetanoteApplication;
 use crate::config::PKGDATADIR;
 
 fn main() {
+    // Initialize logger
+    env_logger::init();
+
     // Load and register resources
     let resource = Resource::load(format!("{PKGDATADIR}/metanote.gresource"))
         .expect("Could not load resources");
