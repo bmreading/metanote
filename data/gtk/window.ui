@@ -17,6 +17,12 @@
                                     </object>
                                 </property>
                                 <property name="show-end-title-buttons" bind-source="leaflet" bind-property="folded" bind-flags="sync-create"/>
+                                <child type="start">
+                                    <object class="GtkButton" id="add_button">
+                                        <property name="icon-name">list-add-symbolic</property>
+                                        <property name="action-name">win.open</property>
+                                    </object>
+                                </child>
                             </object>
                         </child>
                         <child>
