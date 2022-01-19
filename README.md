@@ -1,6 +1,7 @@
 # Metanote
 
 Metanote is a metadata editor for audio file formats. It is primarily targeted for the [GNOME platform](https://www.gnome.org).
+Until a release is made available, this is considered a work in progress.
 
 ## Runtime dependencies
 
