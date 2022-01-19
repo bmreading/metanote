@@ -4,9 +4,9 @@ use gtk::subclass::prelude::*;
 
 use adw::WindowTitle;
 use anyhow::Result;
-use glib::{clone, Object};
-use glib::subclass::InitializingObject;
 use gio::{File, FileInfo};
+use glib::subclass::InitializingObject;
+use glib::{clone, Object};
 use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType};
 use gtk_macros::action;
 use log::warn;
@@ -64,7 +64,7 @@ mod imp {
             obj.setup_actions();
         }
     }
-    
+
     impl WidgetImpl for MetanoteApplicationWindow {}
     impl WindowImpl for MetanoteApplicationWindow {}
     impl ApplicationWindowImpl for MetanoteApplicationWindow {}
@@ -114,35 +114,36 @@ impl MetanoteApplicationWindow {
                         .title("Unknown Artist - Unknown Album")
                         .subtitle(track.name().to_str().unwrap())
                         .build();
-                
+
                     tracklist.append(&row);
                 }
             }
-            Err(err) => warn!("unable to parse directory, {err}")
+            Err(err) => warn!("unable to parse directory, {err}"),
         }
     }
 
     fn clear_tracklist(&self) {
         let tracklist = &self.imp().tracklist;
         tracklist.select_all();
-        
+
         for track in tracklist.selected_rows() {
             tracklist.remove(&track);
         }
     }
 
-    fn parse_dir(&self, dir: File) ->  Result<Vec<FileInfo>>{
+    fn parse_dir(&self, dir: File) -> Result<Vec<FileInfo>> {
         let file_enumerator = dir.enumerate_children(
-            "*", 
-            gio::FileQueryInfoFlags::NOFOLLOW_SYMLINKS, 
-            Some(&gio::Cancellable::new()))?;
+            "*",
+            gio::FileQueryInfoFlags::NOFOLLOW_SYMLINKS,
+            Some(&gio::Cancellable::new()),
+        )?;
 
         let mut audio_tracks = Vec::new();
         for child in file_enumerator {
             let file_info = child?;
             if file_info.content_type().unwrap().contains("audio") {
                 audio_tracks.push(file_info);
-            }            
+            }
         }
 
         Ok(audio_tracks)
