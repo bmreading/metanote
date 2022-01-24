@@ -19,6 +19,7 @@
 
 mod app;
 mod config;
+mod metadata;
 mod window;
 
 use adw::prelude::*;
