@@ -28,9 +28,9 @@ use glib::subclass::InitializingObject;
 use glib::{clone, Object};
 use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType};
 use gtk_macros::action;
-use log::warn;
 
 use crate::app::MetanoteApplication;
+use crate::metadata::{MetadataAgent, MetadataReadCapable};
 
 mod imp {
     use super::*;
@@ -112,7 +112,7 @@ impl MetanoteApplicationWindow {
 
                 file_chooser.connect_response(clone!(@weak window => move |fc, response| {
                     if response == ResponseType::Accept {
-                        window.add_tracks(fc.file().expect("Could not retrieve folder from file chooser"));
+                        window.add_tracks(&fc.file().expect("Could not retrieve folder from file chooser"));
                     }
                     fc.destroy();
                 }));
@@ -122,22 +122,45 @@ impl MetanoteApplicationWindow {
         );
     }
 
-    fn add_tracks(&self, dir: File) {
+    fn add_tracks(&self, dir: &File) {
         let tracklist = &self.imp().tracklist;
         self.clear_tracklist();
 
-        match self.parse_dir(dir) {
-            Ok(tracks) => {
-                for track in tracks {
+        let tracks = self.parse_dir(dir).expect("couldn't parse tracks");
+
+        for track in tracks {
+            let path = format!(
+                "{}/{}",
+                dir.path().unwrap().as_path().display(),
+                track.name().as_path().display()
+            );
+            let agent = MetadataAgent::default();
+            let metadata = agent.metadata(&path);
+
+            match metadata {
+                Ok(metadata) => {
+                    let artist = if let Some(a) = &metadata.artist {
+                        a
+                    } else {
+                        "Unknown Artist"
+                    };
+
+                    let title = if let Some(t) = &metadata.title {
+                        t
+                    } else {
+                        "Unknown Title"
+                    };
+
                     let row = adw::ActionRow::builder()
-                        .title("Unknown Artist - Unknown Album")
+                        .title(&format!("{} - {}", artist, title))
                         .subtitle(track.name().to_str().unwrap())
                         .build();
 
                     tracklist.append(&row);
                 }
+
+                Err(e) => log::warn!("track couldn't be read, {}", e),
             }
-            Err(err) => warn!("unable to parse directory, {err}"),
         }
     }
 
@@ -150,7 +173,7 @@ impl MetanoteApplicationWindow {
         }
     }
 
-    fn parse_dir(&self, dir: File) -> Result<Vec<FileInfo>> {
+    fn parse_dir(&self, dir: &File) -> Result<Vec<FileInfo>> {
         let file_enumerator = dir.enumerate_children(
             "*",
             gio::FileQueryInfoFlags::NOFOLLOW_SYMLINKS,
