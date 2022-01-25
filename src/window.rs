@@ -156,6 +156,14 @@ impl MetanoteApplicationWindow {
                         .subtitle(track.name().to_str().unwrap())
                         .build();
 
+                    if let Some(i) = &metadata.images {
+                        let bytes = gtk::glib::Bytes::from(&i[0].data());
+                        let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
+                        let pixbuf = gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE).unwrap();
+                        let image = gtk::Image::from_pixbuf(Some(&pixbuf));
+                        row.add_prefix(image.upcast_ref::<gtk::Widget>());
+                    };
+
                     tracklist.append(&row);
                 }
 

@@ -18,7 +18,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 use anyhow::Result;
-use audiotags::Tag;
+use audiotags::{Picture, Tag};
 use derive_builder::Builder;
 
 #[derive(Builder, Debug, Default)]
@@ -28,6 +28,30 @@ pub struct MetadataContainer {
     pub album_artist: Option<String>,
     pub album: Option<String>,
     pub year: Option<String>,
+    pub images: Option<Vec<Image>>,
+}
+
+#[derive(Builder, Debug, Default)]
+pub struct Image {
+    description: String,
+    mime_type: String,
+    data: Vec<u8>,
+}
+
+impl Clone for Image {
+    fn clone(&self) -> Self {
+        Self {
+            description: self.description.clone(),
+            mime_type: self.mime_type.clone(),
+            data: self.data.clone(),
+        }
+    }
+}
+
+impl Image {
+    pub fn data(&self) -> Vec<u8> {
+        self.data.clone()
+    }
 }
 
 pub trait MetadataReadCapable {
@@ -45,12 +69,33 @@ impl MetadataReadCapable for MetadataAgent {
     fn metadata(&self, path: &str) -> Result<MetadataContainer> {
         let raw = Tag::default().read_from_path(&path)?;
 
+        let images = if let Some(cover) = raw.album_cover() {
+            Some(vec![cover.to_image_with_description("cover")])
+        } else {
+            None
+        };
+
         Ok(MetadataContainerBuilder::default()
             .title(raw.title().map(|t| t.to_string()))
             .artist(raw.artist().map(|a| a.to_string()))
             .album_artist(raw.album_artist().map(|a| a.to_string()))
             .album(raw.album().map(|a| a.title.to_string()))
             .year(raw.year().map(|a| a.to_string()))
+            .images(images)
             .build()?)
+    }
+}
+
+pub trait PictureExt<Picture> {
+    fn to_image_with_description(&self, description: &str) -> Image;
+}
+
+impl<'a> PictureExt<Picture<'a>> for Picture<'a> {
+    fn to_image_with_description(&self, description: &str) -> Image {
+        Image {
+            description: description.to_string(),
+            mime_type: self.mime_type.try_into().unwrap(),
+            data: self.data.to_vec(),
+        }
     }
 }
