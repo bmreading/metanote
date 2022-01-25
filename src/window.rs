@@ -139,13 +139,13 @@ impl MetanoteApplicationWindow {
 
             match metadata {
                 Ok(metadata) => {
-                    let artist = if let Some(a) = &metadata.artist {
+                    let artist = if let Some(a) = &metadata.artist() {
                         a
                     } else {
                         "Unknown Artist"
                     };
 
-                    let title = if let Some(t) = &metadata.title {
+                    let title = if let Some(t) = &metadata.title() {
                         t
                     } else {
                         "Unknown Title"
@@ -156,7 +156,7 @@ impl MetanoteApplicationWindow {
                         .subtitle(track.name().to_str().unwrap())
                         .build();
 
-                    if let Some(i) = &metadata.images {
+                    if let Some(i) = &metadata.images() {
                         let bytes = gtk::glib::Bytes::from(&i[0].data());
                         let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
                         let pixbuf = gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE).unwrap();

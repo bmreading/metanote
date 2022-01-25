@@ -20,15 +20,18 @@
 use anyhow::Result;
 use audiotags::{Picture, Tag};
 use derive_builder::Builder;
+use getset::Getters;
 
-#[derive(Builder, Debug, Default)]
+#[derive(Builder, Debug, Default, Getters)]
+#[get = "pub"]
+#[allow(dead_code)]
 pub struct MetadataContainer {
-    pub title: Option<String>,
-    pub artist: Option<String>,
-    pub album_artist: Option<String>,
-    pub album: Option<String>,
-    pub year: Option<String>,
-    pub images: Option<Vec<Image>>,
+    title: Option<String>,
+    artist: Option<String>,
+    album_artist: Option<String>,
+    album: Option<String>,
+    year: Option<String>,
+    images: Option<Vec<Image>>,
 }
 
 #[derive(Debug)]
