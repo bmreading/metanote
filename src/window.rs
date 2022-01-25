@@ -157,7 +157,7 @@ impl MetanoteApplicationWindow {
                         .build();
 
                     if let Some(i) = &metadata.images() {
-                        let bytes = gtk::glib::Bytes::from(&i[0].data());
+                        let bytes = gtk::glib::Bytes::from(i[0].data());
                         let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
                         let pixbuf = gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE).unwrap();
                         let image = gtk::Image::from_pixbuf(Some(&pixbuf));

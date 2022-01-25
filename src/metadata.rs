@@ -34,27 +34,13 @@ pub struct MetadataContainer {
     images: Option<Vec<Image>>,
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug, Getters)]
+#[get = "pub"]
+#[allow(dead_code)]
 pub struct Image {
     description: String,
     mime_type: String,
     data: Vec<u8>,
-}
-
-impl Clone for Image {
-    fn clone(&self) -> Self {
-        Self {
-            description: self.description.clone(),
-            mime_type: self.mime_type.clone(),
-            data: self.data.clone(),
-        }
-    }
-}
-
-impl Image {
-    pub fn data(&self) -> Vec<u8> {
-        self.data.clone()
-    }
 }
 
 pub trait MetadataReadCapable {
