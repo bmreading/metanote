@@ -31,7 +31,7 @@ pub struct MetadataContainer {
     pub images: Option<Vec<Image>>,
 }
 
-#[derive(Builder, Debug, Default)]
+#[derive(Debug)]
 pub struct Image {
     description: String,
     mime_type: String,
