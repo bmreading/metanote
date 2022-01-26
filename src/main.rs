@@ -20,6 +20,7 @@
 mod app;
 mod config;
 mod metadata;
+mod row;
 mod window;
 
 use adw::prelude::*;
