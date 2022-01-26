@@ -21,6 +21,7 @@ use anyhow::Result;
 use audiotags::{Picture, Tag};
 use derive_builder::Builder;
 use getset::Getters;
+use std::path::Path;
 
 #[derive(Builder, Debug, Default, Getters)]
 #[get = "pub"]
@@ -44,19 +45,19 @@ pub struct Image {
 }
 
 pub trait MetadataReadCapable {
-    fn metadata(&self, path: &str) -> Result<MetadataContainer>;
+    fn metadata(&self, path: &Path) -> Result<MetadataContainer>;
 }
 
 pub trait MetadataWriteCapable {
-    fn write_metadata(&self, path: &str, metadata: MetadataContainer) -> Result<()>;
+    fn write_metadata(&self, path: &Path, metadata: MetadataContainer) -> Result<()>;
 }
 
 #[derive(Builder, Debug, Default)]
 pub struct MetadataAgent {}
 
 impl MetadataReadCapable for MetadataAgent {
-    fn metadata(&self, path: &str) -> Result<MetadataContainer> {
-        let raw = Tag::default().read_from_path(&path)?;
+    fn metadata(&self, path: &Path) -> Result<MetadataContainer> {
+        let raw = Tag::default().read_from_path(path)?;
 
         let images = if let Some(cover) = raw.album_cover() {
             Some(vec![cover.to_image_with_description("cover")])
