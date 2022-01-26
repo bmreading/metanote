@@ -30,7 +30,6 @@ use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, Resp
 use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
-use crate::metadata::{MetadataAgent, MetadataReadCapable};
 
 mod imp {
     use super::*;
@@ -129,49 +128,12 @@ impl MetanoteApplicationWindow {
         let tracks = self.parse_dir(dir).expect("couldn't parse tracks");
 
         for track in tracks {
-            let path = format!(
-                "{}/{}",
-                dir.path().unwrap().as_path().display(),
-                track.name().as_path().display()
-            );
-            let agent = MetadataAgent::default();
-            let metadata = agent.metadata(&path);
+            let path = dir.path().unwrap().join(track.name().as_path());
 
-            match metadata {
-                Ok(metadata) => {
-                    let artist = if let Some(a) = &metadata.artist() {
-                        a
-                    } else {
-                        "Unknown Artist"
-                    };
-
-                    let title = if let Some(t) = &metadata.title() {
-                        t
-                    } else {
-                        "Unknown Title"
-                    };
-
-                    let row = adw::ActionRow::builder()
-                        .title(&format!("{} - {}", artist, title))
-                        .subtitle(track.name().to_str().unwrap())
-                        .build();
-
-                    if let Some(i) = &metadata.images() {
-                        let bytes = gtk::glib::Bytes::from(i[0].data());
-                        let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
-                        let pixbuf = gtk::gdk_pixbuf::Pixbuf::from_stream(
-                            &stream,
-                            gtk::gio::Cancellable::NONE,
-                        )
-                        .unwrap();
-                        let image = gtk::Image::from_pixbuf(Some(&pixbuf));
-                        row.add_prefix(image.upcast_ref::<gtk::Widget>());
-                    };
-
-                    tracklist.append(&row);
-                }
-
-                Err(e) => log::warn!("track couldn't be read, {}", e),
+            let row = crate::row::MetanoteRow::new(&path);
+            match row {
+                Ok(row) => tracklist.append(&row),
+                Err(err) => log::warn!("unable to display track, {err}"),
             }
         }
     }
