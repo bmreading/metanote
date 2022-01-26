@@ -17,7 +17,7 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use anyhow::Result;
+use anyhow::{Error, Result};
 use audiotags::{Picture, Tag};
 use derive_builder::Builder;
 use getset::Getters;
@@ -57,6 +57,12 @@ pub struct MetadataAgent {}
 
 impl MetadataReadCapable for MetadataAgent {
     fn metadata(&self, path: &Path) -> Result<MetadataContainer> {
+        // Test this path before we try it, because
+        // the backend panics on bad paths
+        if !path.is_file() {
+            return Err(Error::msg("bad path"));
+        }
+        
         let raw = Tag::default().read_from_path(path)?;
 
         let images = if let Some(cover) = raw.album_cover() {
