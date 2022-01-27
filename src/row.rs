@@ -79,10 +79,13 @@ impl MetanoteRow {
             ("subtitle", &file_name),
         ])?;
 
+        let avatar;
         if let Some(a) = Self::art_from_metadata(&metadata) {
-            row.add_prefix(&a);
+            avatar = Avatar::new(50, None, false);
+            avatar.set_custom_image(Some(&a.paintable().expect("bad art")));
+            row.add_prefix(&avatar);
         } else {
-            let avatar = Avatar::new(50, Some(&row.title()), true);
+            avatar = Avatar::new(50, Some(&row.title()), true);
             row.add_prefix(&avatar);
         };
 
