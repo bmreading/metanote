@@ -77,6 +77,7 @@ impl MetanoteRow {
         let row: MetanoteRow = Object::new(&[
             ("title", &Self::title_from_metadata(&metadata)),
             ("subtitle", &file_name),
+            ("height-request", &80),
         ])?;
 
         let avatar;
