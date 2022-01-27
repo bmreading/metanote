@@ -32,13 +32,13 @@ pub struct MetadataContainer {
     album_artist: Option<String>,
     album: Option<String>,
     year: Option<String>,
-    images: Option<Vec<Image>>,
+    art: Option<Vec<Art>>,
 }
 
 #[derive(Clone, Debug, Getters)]
 #[get = "pub"]
 #[allow(dead_code)]
-pub struct Image {
+pub struct Art {
     description: String,
     mime_type: String,
     data: Vec<u8>,
@@ -65,8 +65,8 @@ impl MetadataReadCapable for MetadataAgent {
         
         let raw = Tag::default().read_from_path(path)?;
 
-        let images = if let Some(cover) = raw.album_cover() {
-            Some(vec![cover.to_image_with_description("cover")])
+        let art = if let Some(cover) = raw.album_cover() {
+            Some(vec![cover.to_art_with_description("cover")])
         } else {
             None
         };
@@ -77,18 +77,18 @@ impl MetadataReadCapable for MetadataAgent {
             .album_artist(raw.album_artist().map(|a| a.to_string()))
             .album(raw.album().map(|a| a.title.to_string()))
             .year(raw.year().map(|a| a.to_string()))
-            .images(images)
+            .art(art)
             .build()?)
     }
 }
 
 pub trait PictureExt<Picture> {
-    fn to_image_with_description(&self, description: &str) -> Image;
+    fn to_art_with_description(&self, description: &str) -> Art;
 }
 
 impl<'a> PictureExt<Picture<'a>> for Picture<'a> {
-    fn to_image_with_description(&self, description: &str) -> Image {
-        Image {
+    fn to_art_with_description(&self, description: &str) -> Art {
+        Art {
             description: description.to_string(),
             mime_type: self.mime_type.try_into().unwrap(),
             data: self.data.to_vec(),
