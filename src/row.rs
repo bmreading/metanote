@@ -96,9 +96,9 @@ impl MetanoteRow {
     }
 
     fn art_from_metadata(metadata: &MetadataContainer) -> Option<Image> {
-        match &metadata.images() {
-            Some(images) => {
-                let bytes = gtk::glib::Bytes::from(images[0].data());
+        match &metadata.art() {
+            Some(art) => {
+                let bytes = gtk::glib::Bytes::from(art[0].data());
                 let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
                 let pixbuf =
                     gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE)
