@@ -28,7 +28,7 @@ use gtk::gio::{File, FileInfo};
 use gtk::glib;
 use gtk::glib::subclass::InitializingObject;
 use gtk::glib::{clone, Object};
-use gtk::{Box, CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType};
+use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType, Stack};
 use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
@@ -42,7 +42,7 @@ mod imp {
         pub file_chooser: FileChooserNative,
 
         #[template_child]
-        pub content_view: TemplateChild<Box>,
+        pub content_stack: TemplateChild<Stack>,
         #[template_child]
         pub tracklist: TemplateChild<ListBox>,
         #[template_child]
@@ -63,10 +63,10 @@ mod imp {
                 .modal(true)
                 .action(FileChooserAction::SelectFolder)
                 .build();
-
+            
             Self {
                 file_chooser,
-                content_view: TemplateChild::default(),
+                content_stack: TemplateChild::default(),
                 tracklist: TemplateChild::default(),
                 main_title: TemplateChild::default(),
             }

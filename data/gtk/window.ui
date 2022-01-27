@@ -48,7 +48,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkBox" id="content_view">
+                    <object class="GtkBox">
                         <property name="orientation">vertical</property>
                         <property name="hexpand">True</property>
                         <child>
@@ -60,12 +60,16 @@
                             </object>
                         </child>
                         <child>
-                            <object class="AdwStatusPage">
-                                <property name="icon-name">library-music-symbolic</property>
-                                <property name="title" translatable="yes">Welcome to Metanote</property>
-                                <property name="description" translatable="yes">Open some audio tracks to begin.</property>
-                                <property name="valign">center</property>
-                                <property name="vexpand">True</property>
+                            <object class="GtkStack" id="content_stack">
+                                <child>
+                                    <object class="AdwStatusPage" id="status_page">
+                                        <property name="icon-name">library-music-symbolic</property>
+                                        <property name="title" translatable="yes">Welcome to Metanote</property>
+                                        <property name="description" translatable="yes">Open some audio tracks to begin.</property>
+                                        <property name="valign">center</property>
+                                        <property name="vexpand">True</property>
+                                    </object>
+                                </child>
                             </object>
                         </child>
                     </object>
