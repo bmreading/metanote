@@ -22,6 +22,7 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
+use adw::Avatar;
 use anyhow::{Context, Error, Result};
 use gtk::glib::Object;
 use gtk::Image;
@@ -75,6 +76,9 @@ impl MetanoteRow {
 
         if let Some(a) = Self::art_from_metadata(&metadata) {
             row.add_prefix(&a);
+        } else {
+            let avatar = Avatar::new(50, Some(&row.title()), true);
+            row.add_prefix(&avatar);
         };
 
         let imp = row.imp();
