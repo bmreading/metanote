@@ -48,7 +48,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkBox" id="metadata-view">
+                    <object class="GtkBox" id="content_view">
                         <property name="orientation">vertical</property>
                         <property name="hexpand">True</property>
                         <child>

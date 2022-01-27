@@ -28,7 +28,7 @@ use gtk::gio::{File, FileInfo};
 use gtk::glib;
 use gtk::glib::subclass::InitializingObject;
 use gtk::glib::{clone, Object};
-use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType};
+use gtk::{Box, CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType};
 use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
@@ -41,6 +41,8 @@ mod imp {
     pub struct MetanoteApplicationWindow {
         pub file_chooser: FileChooserNative,
 
+        #[template_child]
+        pub content_view: TemplateChild<Box>,
         #[template_child]
         pub tracklist: TemplateChild<ListBox>,
         #[template_child]
@@ -64,6 +66,7 @@ mod imp {
 
             Self {
                 file_chooser,
+                content_view: TemplateChild::default(),
                 tracklist: TemplateChild::default(),
                 main_title: TemplateChild::default(),
             }
