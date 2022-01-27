@@ -25,7 +25,7 @@ use gtk::subclass::prelude::*;
 use adw::Avatar;
 use anyhow::{Context, Error, Result};
 use gtk::glib::Object;
-use gtk::Image;
+use gtk::Picture;
 use std::cell::{Cell, RefCell};
 use std::path::{Path, PathBuf};
 
@@ -95,7 +95,7 @@ impl MetanoteRow {
         format!("{artist} - {title}")
     }
 
-    fn art_from_metadata(metadata: &MetadataContainer) -> Option<Image> {
+    fn art_from_metadata(metadata: &MetadataContainer) -> Option<Picture> {
         match &metadata.art() {
             Some(art) => {
                 let bytes = gtk::glib::Bytes::from(art[0].data());
@@ -103,7 +103,7 @@ impl MetanoteRow {
                 let pixbuf =
                     gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE)
                         .unwrap();
-                Some(Image::from_pixbuf(Some(&pixbuf)))
+                Some(Picture::for_pixbuf(&pixbuf))
             }
             None => None,
         }
