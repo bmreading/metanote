@@ -24,6 +24,7 @@ use gtk::subclass::prelude::*;
 
 use adw::Avatar;
 use anyhow::{Context, Error, Result};
+use gtk::glib;
 use gtk::glib::Object;
 use gtk::Picture;
 use std::cell::{Cell, RefCell};
@@ -56,7 +57,7 @@ mod imp {
     impl ActionRowImpl for MetanoteRow {}
 }
 
-glib::wrapper! {
+gtk::glib::wrapper! {
     pub struct MetanoteRow(ObjectSubclass<imp::MetanoteRow>)
     @extends adw::ActionRow, adw::PreferencesRow, gtk::ListBoxRow,gtk::Widget,
         gtk::glib::InitiallyUnowned,

@@ -14,8 +14,6 @@ audiotags = "0.2.7182"
 derive_builder = "0.10.2"
 env_logger = "0.9.0"
 getset = "0.1.2"
-gio = "0.15.2"
-glib = "0.15.2"
 gtk = { version = "0.4.2", package = "gtk4" }
 gtk-macros = "0.3.0"
 log = "0.4.14"

@@ -22,8 +22,9 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
-use gio::{ActionGroup, ActionMap};
-use glib::object_subclass;
+use gtk::gio;
+use gtk::gio::{ActionGroup, ActionMap};
+use gtk::glib;
 
 use crate::config::APP_ID;
 use crate::window::MetanoteApplicationWindow;
@@ -34,7 +35,7 @@ mod imp {
     #[derive(Default)]
     pub struct MetanoteApplication;
 
-    #[object_subclass]
+    #[glib::object_subclass]
     impl ObjectSubclass for MetanoteApplication {
         const NAME: &'static str = "MetanoteApplication";
         type Type = super::MetanoteApplication;

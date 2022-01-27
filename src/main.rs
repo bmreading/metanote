@@ -25,7 +25,8 @@ mod window;
 
 use adw::prelude::*;
 
-use gio::Resource;
+use gtk::gio;
+use gtk::gio::Resource;
 
 use crate::app::MetanoteApplication;
 use crate::config::PKGDATADIR;

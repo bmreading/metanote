@@ -23,9 +23,11 @@ use gtk::subclass::prelude::*;
 
 use adw::WindowTitle;
 use anyhow::Result;
-use gio::{File, FileInfo};
-use glib::subclass::InitializingObject;
-use glib::{clone, Object};
+use gtk::gio;
+use gtk::gio::{File, FileInfo};
+use gtk::glib;
+use gtk::glib::subclass::InitializingObject;
+use gtk::glib::{clone, Object};
 use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType};
 use gtk_macros::action;
 
