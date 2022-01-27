@@ -67,7 +67,12 @@ glib::wrapper! {
 impl MetanoteRow {
     pub fn new(path: &Path) -> Result<Self> {
         let metadata = MetadataAgent::default().metadata(path)?;
-        let file_name = path.file_name().context("{path} is a bad path")?.to_owned().into_string().map_err(|_| Error::msg("bad path"))?;
+        let file_name = path
+            .file_name()
+            .context("{path} is a bad path")?
+            .to_owned()
+            .into_string()
+            .map_err(|_| Error::msg("bad path"))?;
 
         let row: MetanoteRow = Object::new(&[
             ("title", &Self::title_from_metadata(&metadata)),

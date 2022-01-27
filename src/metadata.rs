@@ -62,7 +62,7 @@ impl MetadataReadCapable for MetadataAgent {
         if !path.is_file() {
             return Err(Error::msg("bad path"));
         }
-        
+
         let raw = Tag::default().read_from_path(path)?;
 
         let art = if let Some(cover) = raw.album_cover() {
