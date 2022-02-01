@@ -23,7 +23,7 @@ use derive_builder::Builder;
 use getset::Getters;
 use std::path::Path;
 
-#[derive(Builder, Debug, Default, Getters)]
+#[derive(Builder, Debug, Default, Getters, PartialEq)]
 #[get = "pub"]
 #[allow(dead_code)]
 pub struct MetadataContainer {
@@ -35,7 +35,7 @@ pub struct MetadataContainer {
     art: Option<Vec<Art>>,
 }
 
-#[derive(Clone, Debug, Getters)]
+#[derive(Clone, Debug, Getters, PartialEq)]
 #[get = "pub"]
 #[allow(dead_code)]
 pub struct Art {
