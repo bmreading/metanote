@@ -34,6 +34,7 @@
                                 <child>
                                     <object class="GtkListBox" id="tracklist">
                                         <property name="selection-mode">multiple</property>
+                                        <property name="activate-on-single-click">False</property>
                                         <style><class name="navigation-sidebar"/></style>
                                     </object>
                                 </child>
