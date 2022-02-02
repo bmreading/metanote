@@ -23,7 +23,7 @@ use derive_builder::Builder;
 use getset::Getters;
 use std::path::Path;
 
-#[derive(Builder, Debug, Default, Getters, PartialEq)]
+#[derive(Builder, Clone, Debug, Default, Getters, PartialEq)]
 #[get = "pub"]
 #[allow(dead_code)]
 pub struct MetadataContainer {
@@ -33,6 +33,55 @@ pub struct MetadataContainer {
     album: Option<String>,
     year: Option<String>,
     art: Option<Vec<Art>>,
+}
+
+impl MetadataContainer {
+    /// Returns a single MetadataContainer consolidated with matching fields.
+    /// Non-matching fields are None
+    pub fn merge(containers: &[Self]) -> Self {
+        let mut consolidated_container = Self::default();
+
+        if containers
+            .iter()
+            .all(|c| c.title().eq(&containers[0].title))
+        {
+            consolidated_container.title = containers[0].title.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.artist().eq(&containers[0].artist()))
+        {
+            consolidated_container.artist = containers[0].artist.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.album_artist.eq(&containers[0].album_artist()))
+        {
+            consolidated_container.album_artist = containers[0].album_artist.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.album().eq(&containers[0].album()))
+        {
+            consolidated_container.album = containers[0].album.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.year().eq(&containers[0].year()))
+        {
+            consolidated_container.year = containers[0].year.clone();
+        }
+
+        if containers.iter().all(|c| c.art().eq(&containers[0].art())) {
+            consolidated_container.art = containers[0].art.clone();
+        }
+
+        consolidated_container
+    }
 }
 
 #[derive(Clone, Debug, Getters, PartialEq)]
