@@ -5,6 +5,7 @@
         <property name="default-height">576</property>
         <child>
             <object class="AdwLeaflet" id="leaflet">
+                <property name="visible-child">main</property>
                 <child>
                     <object class="GtkBox">
                         <property name="height-request">350</property>
@@ -49,7 +50,7 @@
                     </object>
                 </child>
                 <child>
-                    <object class="GtkBox">
+                    <object class="GtkBox" id="main">
                         <property name="orientation">vertical</property>
                         <property name="hexpand">True</property>
                         <child>
