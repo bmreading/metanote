@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+    <template class="MetanoteEditorPage" parent="GtkBox">
+        <property name="orientation">vertical</property>
+        <child>
+            <object class="GtkScrolledWindow">
+                <property name="propagate-natural-height">True</property>
+                <property name="propagate-natural-width">True</property>
+                <child>
+                    <object class="GtkFlowBox">
+                        <property name="homogeneous">True</property>
+                        <property name="selection-mode">none</property>
+                        <child>
+                            <object class="GtkFlowBoxChild">
+                                <property name="valign">fill</property>
+                                <property name="halign">fill</property>
+                                <child>
+                                    <object class="AdwClamp">
+                                        <property name="maximum-size">300</property>
+                                        <property name="valign">center</property>
+                                        <property name="halign">center</property>
+                                        <child>
+                                            <object class="AdwCarousel" id="art_carousel">
+                                                <property name="margin-start">20</property>
+                                                <property name="margin-end">20</property>
+                                                <property name="margin-top">20</property>
+                                                <property name="margin-bottom">20</property>
+                                                <style><class name="card" /></style>
+                                            </object>
+                                        </child>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+                        <child>
+                            <object class="GtkFlowBoxChild">
+                                <property name="valign">center</property>
+                                <property name="halign">fill</property>
+                                <child>
+                                    <object class="AdwPreferencesGroup" id="tag_row_group">
+                                        <property name="margin-start">20</property>
+                                        <property name="margin-end">20</property>
+                                        <property name="margin-bottom">20</property>
+                                        <child>
+                                            <object class="AdwActionRow" id="title_row">
+                                                <property name="subtitle">Title</property>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow" id="artist_row">
+                                                <property name="subtitle">Artist</property>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow" id="album_artist_row">
+                                                <property name="subtitle">Album Artist</property>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow" id="album_row">
+                                                <property name="subtitle">Album</property>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow" id="genre_row">
+                                                <property name="subtitle">Genre</property>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow" id="year_row">
+                                                <property name="subtitle">Year</property>
+                                            </object>
+                                        </child>
+                                    </object>
+                                </child>
+                            </object>
+                        </child>
+                    </object>
+                </child>
+            </object>
+        </child>
+    </template>
+</interface>

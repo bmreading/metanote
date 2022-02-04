@@ -2,6 +2,7 @@
 <gresources>
     <gresource prefix="/com/github/bmreading/Metanote">
         <file alias="window.ui">gtk/window.ui</file>
+        <file alias="editor_page.ui">gtk/editor_page.ui</file>
         <file preprocess="xml-stripblanks">icons/music-queue-symbolic.svg</file>
         <file preprocess="xml-stripblanks">icons/library-music-symbolic.svg</file>
     </gresource>
