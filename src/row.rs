@@ -26,7 +26,6 @@ use adw::Avatar;
 use anyhow::{Context, Error, Result};
 use gtk::glib;
 use gtk::glib::Object;
-use gtk::Picture;
 use std::cell::{Cell, RefCell};
 use std::path::{Path, PathBuf};
 
@@ -82,7 +81,7 @@ impl MetanoteRow {
         ])?;
 
         let avatar;
-        if let Some(a) = Self::art_from_metadata(&metadata) {
+        if let Some(a) = metadata.picture_widget() {
             avatar = Avatar::new(50, None, false);
             avatar.set_custom_image(Some(&a.paintable().expect("bad art")));
             row.add_prefix(&avatar);
@@ -103,20 +102,6 @@ impl MetanoteRow {
         let artist = metadata.artist().as_ref().unwrap_or(unknown);
         let title = metadata.title().as_ref().unwrap_or(unknown);
         format!("{artist} - {title}")
-    }
-
-    fn art_from_metadata(metadata: &MetadataContainer) -> Option<Picture> {
-        match &metadata.art() {
-            Some(art) => {
-                let bytes = gtk::glib::Bytes::from(art[0].data());
-                let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
-                let pixbuf =
-                    gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE)
-                        .unwrap();
-                Some(Picture::for_pixbuf(&pixbuf))
-            }
-            None => None,
-        }
     }
 }
 
