@@ -41,33 +41,63 @@
                                         <property name="margin-bottom">20</property>
                                         <property name="valign">center</property>
                                         <child>
-                                            <object class="AdwActionRow" id="title_row">
-                                                <property name="subtitle">Title</property>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Title</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="title_text">
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
                                             </object>
                                         </child>
                                         <child>
-                                            <object class="AdwActionRow" id="artist_row">
-                                                <property name="subtitle">Artist</property>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Artist</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="artist_text">
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
                                             </object>
                                         </child>
                                         <child>
-                                            <object class="AdwActionRow" id="album_artist_row">
-                                                <property name="subtitle">Album Artist</property>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Album Artist</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="album_artist_text">
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
                                             </object>
                                         </child>
                                         <child>
-                                            <object class="AdwActionRow" id="album_row">
-                                                <property name="subtitle">Album</property>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Album</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="album_text">
+                                                        <property name="valign">center</property>
+                                                </object>
+                                                </child>
                                             </object>
                                         </child>
                                         <child>
-                                            <object class="AdwActionRow" id="genre_row">
-                                                <property name="subtitle">Genre</property>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Genre</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="genre_text">
+                                                        <property name="valign">center</property>
+                                                </object>
+                                                </child>
                                             </object>
                                         </child>
                                         <child>
-                                            <object class="AdwActionRow" id="year_row">
-                                                <property name="subtitle">Year</property>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Year</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="year_text">
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
                                             </object>
                                         </child>
                                     </object>
