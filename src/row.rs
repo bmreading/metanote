@@ -81,9 +81,10 @@ impl MetanoteRow {
         ])?;
 
         let avatar;
-        if let Some(a) = metadata.picture_widget() {
+        if let Some(art) = metadata.art() {
+            let cover = art[0].to_picture_widget().paintable().expect("bad art");
             avatar = Avatar::new(50, None, false);
-            avatar.set_custom_image(Some(&a.paintable().expect("bad art")));
+            avatar.set_custom_image(Some(&cover));
             row.add_prefix(&avatar);
         } else {
             avatar = Avatar::new(50, Some(&row.title()), true);
