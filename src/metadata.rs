@@ -36,21 +36,6 @@ pub struct MetadataContainer {
 }
 
 impl MetadataContainer {
-    /// Returns a GTK Picture widget
-    pub fn picture_widget(&self) -> Option<gtk::Picture> {
-        match self.art() {
-            Some(art) => {
-                let bytes = gtk::glib::Bytes::from(art[0].data());
-                let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
-                let pixbuf =
-                    gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE)
-                        .unwrap();
-                Some(gtk::Picture::for_pixbuf(&pixbuf))
-            }
-            None => None,
-        }
-    }
-
     /// Returns a single MetadataContainer consolidated with matching fields.
     /// Non-matching fields are None
     pub fn merge(containers: &[Self]) -> Self {
@@ -114,6 +99,15 @@ impl Art {
             &self.data,
             MimeType::try_from(self.mime_type().as_str())?,
         ))
+    }
+
+    /// Returns a GTK Picture widget
+    pub fn to_picture_widget(&self) -> gtk::Picture {
+        let bytes = gtk::glib::Bytes::from(self.data());
+        let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
+        let pixbuf =
+            gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE).unwrap();
+        gtk::Picture::for_pixbuf(&pixbuf)
     }
 }
 
