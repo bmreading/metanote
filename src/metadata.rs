@@ -17,10 +17,10 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use anyhow::{Context, Error, Result};
-use audiotags::{MimeType, Picture, Tag};
+use anyhow::{Context, Result};
 use derive_builder::Builder;
 use getset::Getters;
+use lofty::{Accessor, ItemKey, ItemValue, PictureType, Probe, TagItem};
 use std::path::Path;
 
 #[derive(Builder, Clone, Debug, Default, Getters, PartialEq)]
@@ -88,7 +88,7 @@ impl MetadataContainer {
 #[get = "pub"]
 #[allow(dead_code)]
 pub struct Art {
-    description: String,
+    description: Option<String>,
     mime_type: String,
     data: Vec<u8>,
 }
@@ -101,13 +101,6 @@ impl Art {
         let pixbuf =
             gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE).unwrap();
         gtk::Picture::for_pixbuf(&pixbuf)
-    }
-
-    fn to_picture(&self) -> Result<Picture> {
-        Ok(Picture::new(
-            &self.data,
-            MimeType::try_from(self.mime_type().as_str())?,
-        ))
     }
 }
 
@@ -124,79 +117,119 @@ pub struct MetadataAgent {}
 
 impl MetadataReadCapable for MetadataAgent {
     fn metadata(&self, path: &Path) -> Result<MetadataContainer> {
-        // Test this path before we try it, because
-        // the backend panics on bad paths
-        if !path.is_file() {
-            return Err(Error::msg("bad path"));
-        }
+        let tagged_file = Probe::open(path)?.read(true)?;
 
-        let raw = Tag::default().read_from_path(path)?;
-
-        let art = if let Some(cover) = raw.album_cover() {
-            Some(vec![cover.to_art_with_description("cover")])
-        } else {
-            None
+        let tag = match tagged_file.primary_tag() {
+            Some(primary_tag) => primary_tag,
+            None => tagged_file.first_tag().context("Error: No tags found!")?,
         };
 
+        let mut art = Vec::new();
+        for art_element in tag.pictures() {
+            let art_element = Art {
+                description: art_element.description().map(|d| d.to_string()),
+                mime_type: art_element.mime_type().to_string(),
+                data: art_element.data().to_vec(),
+            };
+
+            art.push(art_element);
+        }
+
+        // Debug log metadata info
+        log::debug!(
+            "Found tagged item at {}",
+            path.to_str().context("failed to parse path as str")?
+        );
+        for item in tag.items() {
+            log::debug!("{:?} - {:?}", item.key(), item.value());
+        }
+
         Ok(MetadataContainerBuilder::default()
-            .title(raw.title().map(|t| t.to_string()))
-            .artist(raw.artist().map(|a| a.to_string()))
-            .album_artist(raw.album_artist().map(|a| a.to_string()))
-            .album(raw.album().map(|a| a.title.to_string()))
-            .year(raw.year().map(|a| a.to_string()))
-            .art(art)
+            .title(tag.title().map(|t| t.to_string()))
+            .artist(tag.artist().map(|a| a.to_string()))
+            .album(tag.album().map(|a| a.to_string()))
+            .album_artist(tag.get_string(&ItemKey::AlbumArtist).map(|a| a.to_string()))
+            .year(
+                tag.get_string(&ItemKey::RecordingDate)
+                    .map(|y| y.to_string()),
+            )
+            .art(Some(art))
             .build()?)
     }
 }
 
 impl MetadataWriteCapable for MetadataAgent {
     fn write_metadata(&self, path: &Path, metadata: &MetadataContainer) -> Result<()> {
-        // Test this path before we try it, because
-        // the backend panics on bad paths
-        if !path.is_file() {
-            return Err(Error::msg("bad path"));
+        let mut tagged_file = Probe::open(path)?.read(false)?;
+
+        let tag = tagged_file
+            .primary_tag_mut()
+            .context("primary tag unable to be found")?;
+
+        if let Some(title) = metadata.title() {
+            tag.set_title(title.to_string())
         }
 
-        let empty_value = String::from("");
+        if let Some(artist) = metadata.artist() {
+            tag.set_artist(artist.to_string())
+        }
 
-        let album = match metadata.art() {
-            Some(art) => {
-                let cover = art[0].to_picture()?;
-                audiotags::Album::with_all(
-                    &metadata.album().as_ref().unwrap_or(&empty_value),
-                    &metadata.album_artist().as_ref().unwrap_or(&empty_value),
-                    cover,
-                )
+        if let Some(album) = metadata.album() {
+            tag.set_album(album.to_string())
+        }
+
+        if let Some(album_artist) = metadata.album_artist() {
+            tag.insert_item(TagItem::new(
+                ItemKey::AlbumArtist,
+                ItemValue::Text(album_artist.to_string()),
+            ));
+        }
+
+        if let Some(year) = metadata.year() {
+            tag.insert_item(TagItem::new(
+                ItemKey::RecordingDate,
+                ItemValue::Text(year.to_string()),
+            ));
+        }
+
+        let mut pic_types = Vec::new();
+        for existing_picture in tag.pictures() {
+            pic_types.push(existing_picture.pic_type());
+        }
+        pic_types.dedup();
+
+        // Remove existing art
+        for pic_type in pic_types {
+            tag.remove_picture_type(pic_type);
+        }
+
+        if let Some(art) = metadata.art() {
+            for art_item in art {
+                if art_item.description().is_some() {
+                    let mut picture_type = PictureType::Other;
+                    if art_item.description().as_ref().unwrap() == "cover" {
+                        picture_type = PictureType::CoverFront
+                    };
+
+                    tag.push_picture(lofty::Picture::new_unchecked(
+                        picture_type,
+                        lofty::MimeType::from_str(art_item.mime_type()),
+                        art_item.description().to_owned(),
+                        art_item.data().to_vec(),
+                    ));
+                } else {
+                    tag.push_picture(lofty::Picture::new_unchecked(
+                        PictureType::Other,
+                        lofty::MimeType::from_str(art_item.mime_type()),
+                        None,
+                        art_item.data().to_vec(),
+                    ));
+                }
             }
-            None => audiotags::Album::with_title(metadata.album().as_ref().unwrap_or(&empty_value))
-                .and_artist(&metadata.album_artist().as_ref().unwrap_or(&empty_value)),
-        };
-
-        let mut file = Tag::new().read_from_path(path)?;
-        file.set_title(metadata.title().as_ref().unwrap_or(&empty_value));
-        file.set_artist(metadata.artist().as_ref().unwrap_or(&empty_value));
-        file.set_album(album);
-
-        if let Some(year) = &metadata.year {
-            file.set_year(year.parse::<i32>().expect("cannot parse year"));
         }
 
-        file.write_to_path(path.to_str().context("bad path")?)?;
+        tag.save_to_path(path)?;
 
         Ok(())
-    }
-}
-
-pub trait PictureExt<Picture> {
-    fn to_art_with_description(&self, description: &str) -> Art;
-}
-
-impl<'a> PictureExt<Picture<'a>> for Picture<'a> {
-    fn to_art_with_description(&self, description: &str) -> Art {
-        Art {
-            description: description.to_string(),
-            mime_type: self.mime_type.try_into().unwrap(),
-            data: self.data.to_vec(),
-        }
     }
 }
