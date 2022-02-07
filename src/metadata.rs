@@ -17,8 +17,8 @@
 //
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-use anyhow::{Error, Result};
-use audiotags::{Picture, Tag};
+use anyhow::{Context, Error, Result};
+use audiotags::{MimeType, Picture, Tag};
 use derive_builder::Builder;
 use getset::Getters;
 use std::path::Path;
@@ -108,12 +108,21 @@ pub struct Art {
     data: Vec<u8>,
 }
 
+impl Art {
+    pub fn to_picture(&self) -> Result<Picture> {
+        Ok(Picture::new(
+            &self.data,
+            MimeType::try_from(self.mime_type().as_str())?,
+        ))
+    }
+}
+
 pub trait MetadataReadCapable {
     fn metadata(&self, path: &Path) -> Result<MetadataContainer>;
 }
 
 pub trait MetadataWriteCapable {
-    fn write_metadata(&self, path: &Path, metadata: MetadataContainer) -> Result<()>;
+    fn write_metadata(&self, path: &Path, metadata: &MetadataContainer) -> Result<()>;
 }
 
 #[derive(Builder, Debug, Default)]
@@ -143,6 +152,44 @@ impl MetadataReadCapable for MetadataAgent {
             .year(raw.year().map(|a| a.to_string()))
             .art(art)
             .build()?)
+    }
+}
+
+impl MetadataWriteCapable for MetadataAgent {
+    fn write_metadata(&self, path: &Path, metadata: &MetadataContainer) -> Result<()> {
+        // Test this path before we try it, because
+        // the backend panics on bad paths
+        if !path.is_file() {
+            return Err(Error::msg("bad path"));
+        }
+
+        let empty_value = String::from("");
+
+        let album = match metadata.art() {
+            Some(art) => {
+                let cover = art[0].to_picture()?;
+                audiotags::Album::with_all(
+                    &metadata.album().as_ref().unwrap_or(&empty_value),
+                    &metadata.album_artist().as_ref().unwrap_or(&empty_value),
+                    cover,
+                )
+            }
+            None => audiotags::Album::with_title(metadata.album().as_ref().unwrap_or(&empty_value))
+                .and_artist(&metadata.album_artist().as_ref().unwrap_or(&empty_value)),
+        };
+
+        let mut file = Tag::new().read_from_path(path)?;
+        file.set_title(metadata.title().as_ref().unwrap_or(&empty_value));
+        file.set_artist(metadata.artist().as_ref().unwrap_or(&empty_value));
+        file.set_album(album);
+
+        if let Some(year) = &metadata.year {
+            file.set_year(year.parse::<i32>().expect("cannot parse year"));
+        }
+
+        file.write_to_path(path.to_str().context("bad path")?)?;
+
+        Ok(())
     }
 }
 
