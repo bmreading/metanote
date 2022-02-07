@@ -94,13 +94,6 @@ pub struct Art {
 }
 
 impl Art {
-    pub fn to_picture(&self) -> Result<Picture> {
-        Ok(Picture::new(
-            &self.data,
-            MimeType::try_from(self.mime_type().as_str())?,
-        ))
-    }
-
     /// Returns a GTK Picture widget
     pub fn to_picture_widget(&self) -> gtk::Picture {
         let bytes = gtk::glib::Bytes::from(self.data());
@@ -108,6 +101,13 @@ impl Art {
         let pixbuf =
             gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE).unwrap();
         gtk::Picture::for_pixbuf(&pixbuf)
+    }
+
+    fn to_picture(&self) -> Result<Picture> {
+        Ok(Picture::new(
+            &self.data,
+            MimeType::try_from(self.mime_type().as_str())?,
+        ))
     }
 }
 
