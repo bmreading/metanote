@@ -19,6 +19,7 @@
 
 mod app;
 mod config;
+mod editor_page;
 mod metadata;
 mod row;
 mod window;
