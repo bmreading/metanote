@@ -32,6 +32,8 @@ use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, Resp
 use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
+use crate::editor_page::MetanoteEditorPage;
+use crate::row::MetanoteRow;
 
 mod imp {
     use super::*;
@@ -63,7 +65,7 @@ mod imp {
                 .modal(true)
                 .action(FileChooserAction::SelectFolder)
                 .build();
-            
+
             Self {
                 file_chooser,
                 content_stack: TemplateChild::default(),
@@ -84,7 +86,9 @@ mod imp {
     impl ObjectImpl for MetanoteApplicationWindow {
         fn constructed(&self, obj: &Self::Type) {
             self.parent_constructed(obj);
+            obj.bind_editor_page();
             obj.setup_actions();
+            obj.setup_callbacks();
         }
     }
 
@@ -124,6 +128,27 @@ impl MetanoteApplicationWindow {
                 file_chooser.show();
             })
         );
+    }
+
+    fn setup_callbacks(&self) {
+        self.imp().tracklist
+            .connect_selected_rows_changed(clone!(@weak self as window => move |tracklist| {
+                let content_stack = &window.imp().content_stack;
+
+                if tracklist.selected_rows().len() > 0 {
+                    let mut selected_tracks = Vec::new();
+                    for track in tracklist.selected_rows() {
+                        let track = track.downcast::<MetanoteRow>().unwrap();
+                        selected_tracks.push(track);
+                    }
+
+                    let editor_page = content_stack.child_by_name("editor_page").unwrap().downcast::<MetanoteEditorPage>().unwrap();
+                    editor_page.set_metadata(&selected_tracks);
+                    content_stack.set_visible_child(&editor_page);
+                } else {
+                    content_stack.set_visible_child_name("status_page");
+                }
+        }));
     }
 
     fn add_tracks(&self, dir: &File) {
@@ -168,5 +193,17 @@ impl MetanoteApplicationWindow {
         }
 
         Ok(audio_tracks)
+    }
+
+    fn bind_editor_page(&self) {
+        let content_stack = &self.imp().content_stack;
+
+        // Hack to add a name to GtkStackPage added from composite template
+        let status_page = content_stack.visible_child().unwrap();
+        content_stack.remove(&status_page);
+        content_stack.add_named(&status_page, Some("status_page"));
+
+        let editor_page = MetanoteEditorPage::new();
+        content_stack.add_named(&editor_page, Some("editor_page"));
     }
 }
