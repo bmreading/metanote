@@ -20,7 +20,7 @@
 use anyhow::{Context, Result};
 use derive_builder::Builder;
 use getset::Getters;
-use lofty::{Accessor, ItemKey, ItemValue, PictureType, Probe, TagItem};
+use lofty::{Accessor, ItemKey, ItemValue, PictureType, Probe, Tag, TagItem};
 use std::path::Path;
 
 #[derive(Builder, Clone, Debug, Default, Getters, PartialEq)]
@@ -120,10 +120,11 @@ impl MetadataReadCapable for MetadataAgent {
         let tagged_file = Probe::open(path)?.read(true)?;
 
         let tag = match tagged_file.primary_tag() {
-            Some(primary_tag) => primary_tag,
-            None => tagged_file.first_tag().context("Error: No tags found!")?,
+            Some(primary_tag) => primary_tag.to_owned(),
+            None => Tag::new(tagged_file.primary_tag_type()),
         };
 
+        // Handle art
         let mut art = Vec::new();
         for art_element in tag.pictures() {
             let art_element = Art {
@@ -134,6 +135,11 @@ impl MetadataReadCapable for MetadataAgent {
 
             art.push(art_element);
         }
+        
+        let art = match art.len() > 0 {
+            true => Some(art),
+            false => None,
+        };
 
         // Debug log metadata info
         log::debug!(
@@ -153,7 +159,7 @@ impl MetadataReadCapable for MetadataAgent {
                 tag.get_string(&ItemKey::RecordingDate)
                     .map(|y| y.to_string()),
             )
-            .art(Some(art))
+            .art(art)
             .build()?)
     }
 }
