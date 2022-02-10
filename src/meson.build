@@ -1,6 +1,9 @@
 config_data = configuration_data()
+config_data.set_quoted('NAME', name)
+config_data.set_quoted('AUTHORS', authors)
 config_data.set_quoted('APP_ID', app_id)
 config_data.set_quoted('PKGDATADIR', pkgdatadir)
+config_data.set_quoted('VERSION', version)
 
 config_source = configure_file(
     configuration: config_data,
