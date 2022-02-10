@@ -22,11 +22,14 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
+use gtk::AboutDialog;
 use gtk::gio;
 use gtk::gio::{ActionGroup, ActionMap};
 use gtk::glib;
+use gtk::glib::clone;
+use gtk_macros::action;
 
-use crate::config::APP_ID;
+use crate::config::{APP_ID, AUTHORS, NAME, VERSION};
 use crate::window::MetanoteApplicationWindow;
 
 mod imp {
@@ -45,6 +48,7 @@ mod imp {
     impl ObjectImpl for MetanoteApplication {}
     impl ApplicationImpl for MetanoteApplication {
         fn activate(&self, application: &Self::Type) {
+            application.setup_actions();
             let window = MetanoteApplicationWindow::new(application);
             window.present();
         }
@@ -72,5 +76,28 @@ impl MetanoteApplication {
             ("flags", &gio::ApplicationFlags::empty()),
         ])
         .expect("Failed to create MetanoteApplication")
+    }
+
+    fn setup_actions(&self) {
+        action!(
+            self,
+            "about",
+            clone!(@weak self as app => move |_, _| {
+                app.show_about();
+            })
+        );
+    }
+
+    fn show_about(&self) {
+        let window = self.active_window().unwrap();
+        let about_dialog = AboutDialog::builder()
+        .program_name(NAME)
+        .version(VERSION)
+        .authors(AUTHORS.split(',').map(|a| a.to_string()).collect())
+        .modal(true)
+        .transient_for(&window)
+        .build();
+    
+        about_dialog.show();
     }
 }
