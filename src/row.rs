@@ -104,6 +104,11 @@ impl MetanoteRow {
         let title = metadata.title().as_ref().unwrap_or(unknown);
         format!("{artist} - {title}")
     }
+
+    /// Replaces metadata in row
+    pub fn replace_metadata(&self, metadata: MetadataContainer) {
+        self.imp().metadata.replace(metadata);
+    }
 }
 
 #[cfg(test)]
