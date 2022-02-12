@@ -112,8 +112,14 @@ pub trait MetadataWriteCapable {
     fn write_metadata(&self, path: &Path, metadata: &MetadataContainer) -> Result<()>;
 }
 
-#[derive(Builder, Debug, Default)]
+#[derive(Builder, Debug)]
 pub struct MetadataAgent {}
+
+impl MetadataAgent {
+    pub fn new() -> Self {
+        Self {}
+    }
+}
 
 impl MetadataReadCapable for MetadataAgent {
     fn metadata(&self, path: &Path) -> Result<MetadataContainer> {
