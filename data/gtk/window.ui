@@ -73,6 +73,12 @@
                                 <property name="title-widget">
                                     <object class="AdwWindowTitle" id="main_title"/>
                                 </property>
+                                <child type="end">
+                                    <object class="GtkButton" id="save_button">
+                                        <property name="label">Save</property>
+                                        <property name="sensitive">False</property>
+                                    </object>
+                                </child>
                             </object>
                         </child>
                         <child>
