@@ -105,9 +105,9 @@ impl MetanoteRow {
         format!("{artist} - {title}")
     }
 
-    /// Replaces metadata in row
-    pub fn replace_metadata(&self, metadata: MetadataContainer) {
-        self.imp().metadata.replace(metadata);
+    /// Replaces metadata in row by cloning a MetadataContainer reference
+    pub fn replace_metadata(&self, metadata: &MetadataContainer) {
+        self.imp().metadata.replace(metadata.clone());
     }
 }
 
