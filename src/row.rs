@@ -26,7 +26,7 @@ use adw::Avatar;
 use anyhow::{Context, Error, Result};
 use gtk::glib;
 use gtk::glib::Object;
-use std::cell::{Cell, RefCell};
+use std::cell::RefCell;
 use std::path::{Path, PathBuf};
 
 use crate::metadata::{MetadataContainer, MetadataReadCapable};
@@ -39,7 +39,7 @@ mod imp {
         // MetadataContainer acts as the main record.
         // All views on this row simply reflect it.
         pub metadata: RefCell<MetadataContainer>,
-        pub path: Cell<PathBuf>,
+        pub path: RefCell<PathBuf>,
     }
 
     #[glib::object_subclass]
@@ -92,7 +92,7 @@ impl MetanoteRow {
         };
 
         let imp = row.imp();
-        imp.path.set(path.to_path_buf());
+        imp.path.replace(path.to_path_buf());
         imp.metadata.replace(metadata);
 
         Ok(row)
