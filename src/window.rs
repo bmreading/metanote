@@ -28,7 +28,7 @@ use gtk::gio::{File, FileInfo};
 use gtk::glib;
 use gtk::glib::subclass::InitializingObject;
 use gtk::glib::{clone, Object};
-use gtk::{CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType, Stack};
+use gtk::{Button, CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType, Stack};
 use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
@@ -50,6 +50,8 @@ mod imp {
         pub tracklist: TemplateChild<ListBox>,
         #[template_child]
         pub main_title: TemplateChild<WindowTitle>,
+        #[template_child]
+        pub save_button: TemplateChild<Button>,
     }
 
     #[glib::object_subclass]
@@ -72,6 +74,7 @@ mod imp {
                 content_stack: TemplateChild::default(),
                 tracklist: TemplateChild::default(),
                 main_title: TemplateChild::default(),
+                save_button: TemplateChild::default(),
             }
         }
 
@@ -132,7 +135,9 @@ impl MetanoteApplicationWindow {
     }
 
     fn setup_callbacks(&self) {
-        self.imp().tracklist
+        let imp = self.imp();
+
+        imp.tracklist
             .connect_selected_rows_changed(clone!(@weak self as window => move |tracklist| {
                 let content_stack = &window.imp().content_stack;
 
@@ -150,6 +155,18 @@ impl MetanoteApplicationWindow {
                     content_stack.set_visible_child_name("status_page");
                 }
         }));
+
+        imp.save_button
+            .connect_clicked(clone!(@weak self as window => move |_| {
+                let editor_page = window.imp().content_stack.child_by_name("editor_page").unwrap().downcast::<MetanoteEditorPage>().unwrap();
+                let agent = MetadataAgent::new();
+                
+                match editor_page.write_metadata(&agent) {
+                    Ok(_) => (),
+                    Err(e) => log::error!("Failed to save tracks, {}", e),
+                };
+        }));
+
     }
 
     fn add_tracks(&self, dir: &File) {
