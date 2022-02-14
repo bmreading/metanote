@@ -23,13 +23,14 @@ use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
 use adw::{Carousel, PreferencesGroup};
+use anyhow::Result;
 use gtk::glib;
 use gtk::glib::clone;
 use gtk::glib::subclass::InitializingObject;
 use gtk::{Box, CompositeTemplate, Entry, Widget};
 use std::cell::RefCell;
 
-use crate::metadata::MetadataContainer;
+use crate::metadata::{MetadataContainer, MetadataWriteCapable};
 use crate::row::MetanoteRow;
 
 mod imp {
@@ -208,5 +209,21 @@ impl MetanoteEditorPage {
             .set_text(metadata.album().as_ref().unwrap_or(&empty_value));
         imp.year_text
             .set_text(metadata.year().as_ref().unwrap_or(&empty_value));
+    }
+
+    /// Writes metadata to whichever tracks editor has
+    pub fn write_metadata<T: MetadataWriteCapable>(&self, metadata_agent: &T) -> Result<()> {
+        let imp = self.imp();
+        let tracks = imp.metanote_rows.borrow();
+        let metadata_to_write = imp.metadata.borrow();
+
+        for track in tracks.iter() {
+            track.replace_metadata(&metadata_to_write);
+            match track.write_metadata(metadata_agent) {
+                Ok(_) => todo!(),
+                Err(e) => log::error!("failed to write metadata for file at path {} - {}", track.imp().path.borrow().to_str().unwrap(), e),
+            }
+        }
+        Ok(())
     }
 }
