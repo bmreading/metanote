@@ -142,7 +142,7 @@ impl MetadataReadCapable for MetadataAgent {
 
             art.push(art_element);
         }
-        
+
         let art = match art.len() > 0 {
             true => Some(art),
             false => None,

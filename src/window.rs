@@ -28,7 +28,9 @@ use gtk::gio::{File, FileInfo};
 use gtk::glib;
 use gtk::glib::subclass::InitializingObject;
 use gtk::glib::{clone, Object};
-use gtk::{Button, CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType, Stack};
+use gtk::{
+    Button, CompositeTemplate, FileChooserAction, FileChooserNative, ListBox, ResponseType, Stack,
+};
 use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
@@ -104,9 +106,20 @@ mod imp {
 
 glib::wrapper! {
     pub struct MetanoteApplicationWindow(ObjectSubclass<imp::MetanoteApplicationWindow>)
-    @extends adw::ApplicationWindow, gtk::ApplicationWindow, gtk::Window, gtk::Widget,
-    @implements gio::ActionGroup, gio::ActionMap, gtk::Accessible, gtk::Buildable,
-        gtk::ConstraintTarget, gtk::Native, gtk::Root, gtk::ShortcutManager;
+    @extends
+        adw::ApplicationWindow,
+        gtk::ApplicationWindow,
+        gtk::Window,
+        gtk::Widget,
+    @implements 
+        gio::ActionGroup,
+        gio::ActionMap,
+        gtk::Accessible,
+        gtk::Buildable,
+        gtk::ConstraintTarget,
+        gtk::Native,
+        gtk::Root,
+        gtk::ShortcutManager;
 }
 
 impl MetanoteApplicationWindow {
@@ -160,13 +173,11 @@ impl MetanoteApplicationWindow {
             .connect_clicked(clone!(@weak self as window => move |_| {
                 let editor_page = window.imp().content_stack.child_by_name("editor_page").unwrap().downcast::<MetanoteEditorPage>().unwrap();
                 let agent = MetadataAgent::new();
-                
                 match editor_page.write_metadata(&agent) {
                     Ok(_) => (),
                     Err(e) => log::error!("Failed to save tracks, {}", e),
                 };
         }));
-
     }
 
     fn add_tracks(&self, dir: &File) {

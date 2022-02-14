@@ -22,11 +22,11 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
-use gtk::AboutDialog;
 use gtk::gio;
 use gtk::gio::{ActionGroup, ActionMap};
 use gtk::glib;
 use gtk::glib::clone;
+use gtk::AboutDialog;
 use gtk_macros::action;
 
 use crate::config::{APP_ID, AUTHORS, NAME, VERSION};
@@ -59,8 +59,13 @@ mod imp {
 
 glib::wrapper! {
     pub struct MetanoteApplication(ObjectSubclass<imp::MetanoteApplication>)
-    @extends gio::Application, gtk::Application, adw::Application,
-    @implements ActionGroup, ActionMap;
+    @extends 
+        gio::Application,
+        gtk::Application,
+        adw::Application,
+    @implements
+        ActionGroup,
+        ActionMap;
 }
 
 impl Default for MetanoteApplication {
@@ -91,13 +96,13 @@ impl MetanoteApplication {
     fn show_about(&self) {
         let window = self.active_window().unwrap();
         let about_dialog = AboutDialog::builder()
-        .program_name(NAME)
-        .version(VERSION)
-        .authors(AUTHORS.split(',').map(|a| a.to_string()).collect())
-        .modal(true)
-        .transient_for(&window)
-        .build();
-    
+            .program_name(NAME)
+            .version(VERSION)
+            .authors(AUTHORS.split(',').map(|a| a.to_string()).collect())
+            .modal(true)
+            .transient_for(&window)
+            .build();
+
         about_dialog.show();
     }
 }

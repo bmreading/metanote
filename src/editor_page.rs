@@ -221,7 +221,11 @@ impl MetanoteEditorPage {
             track.replace_metadata(&metadata_to_write);
             match track.write_metadata(metadata_agent) {
                 Ok(_) => todo!(),
-                Err(e) => log::error!("failed to write metadata for file at path {} - {}", track.imp().path.borrow().to_str().unwrap(), e),
+                Err(e) => log::error!(
+                    "failed to write metadata for file at path {} - {}",
+                    track.imp().path.borrow().to_str().unwrap(),
+                    e
+                ),
             }
         }
         Ok(())
