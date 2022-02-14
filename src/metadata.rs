@@ -19,12 +19,13 @@
 
 use anyhow::{Context, Result};
 use derive_builder::Builder;
-use getset::Getters;
+use getset::{Getters, Setters};
 use lofty::{Accessor, ItemKey, ItemValue, PictureType, Probe, Tag, TagItem};
 use std::path::Path;
 
-#[derive(Builder, Clone, Debug, Default, Getters, PartialEq)]
+#[derive(Builder, Clone, Debug, Default, Getters, PartialEq, Setters)]
 #[get = "pub"]
+#[set = "pub"]
 #[allow(dead_code)]
 pub struct MetadataContainer {
     title: Option<String>,
