@@ -24,7 +24,8 @@ use gtk::subclass::prelude::*;
 
 use adw::{Carousel, PreferencesGroup};
 use gtk::glib;
-use gtk::glib::subclass::{InitializingObject};
+use gtk::glib::clone;
+use gtk::glib::subclass::InitializingObject;
 use gtk::{Box, CompositeTemplate, Entry, Widget};
 use std::cell::RefCell;
 
@@ -56,6 +57,7 @@ mod imp {
         pub year_text: TemplateChild<Entry>,
 
         pub metanote_rows: RefCell<Vec<MetanoteRow>>,
+        pub metadata: RefCell<MetadataContainer>,
     }
 
     #[glib::object_subclass]
@@ -75,6 +77,7 @@ mod imp {
                 genre_text: TemplateChild::default(),
                 year_text: TemplateChild::default(),
                 metanote_rows: Default::default(),
+                metadata: Default::default(),
             }
         }
 
@@ -87,7 +90,13 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for MetanoteEditorPage {}
+    impl ObjectImpl for MetanoteEditorPage {
+        fn constructed(&self, obj: &Self::Type) {
+            self.parent_constructed(obj);
+            obj.setup_callbacks();
+        }
+    }
+
     impl WidgetImpl for MetanoteEditorPage {}
     impl BoxImpl for MetanoteEditorPage {}
 }
@@ -112,7 +121,7 @@ impl MetanoteEditorPage {
     pub fn set_metadata(&self, rows: &[MetanoteRow]) {
         let imp = self.imp();
         imp.metanote_rows.replace(rows.to_vec());
-        
+
         if rows.len() > 0 {
             // Consolidate metadata into vec
             let mut metadata_containers = Vec::new();
@@ -121,23 +130,64 @@ impl MetanoteEditorPage {
             }
 
             // Merge like metadata fields to determine appropriate metadata to operate on
-            let metadata = MetadataContainer::merge(&metadata_containers);
-            self.set_artwork(&metadata);
-            self.set_textual_tags(&metadata);
+            let merged = MetadataContainer::merge(&metadata_containers);
+            self.set_artwork(&merged);
+            self.set_textual_tags(&merged);
+            imp.metadata.replace(merged);
         }
+    }
+
+    fn setup_callbacks(&self) {
+        self.imp()
+            .title_text
+            .connect_changed(clone!(@weak self as page => move |title| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_title(Some(title.text().to_string()));
+            }));
+
+        self.imp()
+            .artist_text
+            .connect_changed(clone!(@weak self as page => move |artist| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_artist(Some(artist.text().to_string()));
+            }));
+
+        self.imp().album_artist_text.connect_changed(
+            clone!(@weak self as page => move |album_artist| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_album_artist(Some(album_artist.text().to_string()));
+            }),
+        );
+
+        self.imp()
+            .album_text
+            .connect_changed(clone!(@weak self as page => move |album| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_album(Some(album.text().to_string()));
+                log::debug!("{:?}", current_metadata);
+            }));
+
+        self.imp()
+            .year_text
+            .connect_changed(clone!(@weak self as page => move |year| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_year(Some(year.text().to_string()));
+            }));
     }
 
     fn set_artwork(&self, metadata: &MetadataContainer) {
         self.clear_art_carousel();
         if let Some(art) = metadata.art() {
             for art_element in art {
-                self.imp().art_carousel.append(&art_element.to_picture_widget());
+                self.imp()
+                    .art_carousel
+                    .append(&art_element.to_picture_widget());
             }
         }
     }
 
     fn clear_art_carousel(&self) {
-        let imp = self.imp();         
+        let imp = self.imp();
         let children = imp.art_carousel.observe_children();
         for child in children {
             let child_widget = child.downcast::<gtk::Widget>().unwrap();
