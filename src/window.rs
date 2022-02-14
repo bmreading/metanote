@@ -33,6 +33,7 @@ use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
 use crate::editor_page::MetanoteEditorPage;
+use crate::metadata::MetadataAgent;
 use crate::row::MetanoteRow;
 
 mod imp {
@@ -160,7 +161,8 @@ impl MetanoteApplicationWindow {
         for track in tracks {
             let path = dir.path().unwrap().join(track.name().as_path());
 
-            let row = crate::row::MetanoteRow::new(&path);
+            let agent = MetadataAgent::new();
+            let row = crate::row::MetanoteRow::new(&path, &agent);
             match row {
                 Ok(row) => tracklist.append(&row),
                 Err(err) => log::warn!("unable to display track, {err}"),
