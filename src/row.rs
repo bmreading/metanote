@@ -29,7 +29,7 @@ use gtk::glib::Object;
 use std::cell::{Cell, RefCell};
 use std::path::{Path, PathBuf};
 
-use crate::metadata::{MetadataAgent, MetadataContainer, MetadataReadCapable};
+use crate::metadata::{MetadataContainer, MetadataReadCapable};
 
 mod imp {
     use super::*;
@@ -65,8 +65,8 @@ gtk::glib::wrapper! {
 }
 
 impl MetanoteRow {
-    pub fn new(path: &Path) -> Result<Self> {
-        let metadata = MetadataAgent::default().metadata(path)?;
+    pub fn new<T: MetadataReadCapable>(path: &Path, metadata_agent: &T) -> Result<Self> {
+        let metadata = metadata_agent.metadata(path)?;
         let file_name = path
             .file_name()
             .context("{path} is a bad path")?
@@ -115,10 +115,11 @@ impl MetanoteRow {
 mod tests {
 
     use super::*;
+    use crate::metadata::MetadataAgent;
 
     #[test]
     fn bad_path_throws_error() {
-        let row = MetanoteRow::new(Path::new("bad_path"));
+        let row = MetanoteRow::new(Path::new("bad_path"), &MetadataAgent::new());
         assert!(row.is_err());
     }
 }
