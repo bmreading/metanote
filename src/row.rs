@@ -29,7 +29,7 @@ use gtk::glib::Object;
 use std::cell::RefCell;
 use std::path::{Path, PathBuf};
 
-use crate::metadata::{MetadataContainer, MetadataReadCapable};
+use crate::metadata::{MetadataContainer, MetadataReadCapable, MetadataWriteCapable};
 
 mod imp {
     use super::*;
@@ -108,6 +108,12 @@ impl MetanoteRow {
     /// Replaces metadata in row by cloning a MetadataContainer reference
     pub fn replace_metadata(&self, metadata: &MetadataContainer) {
         self.imp().metadata.replace(metadata.clone());
+    }
+
+    /// Writes to file whatever metadata that the row holds
+    pub fn write_metadata<T: MetadataWriteCapable>(&self, metadata_agent: &T) -> Result<()> {
+        let imp = self.imp();
+        metadata_agent.write_metadata(&imp.path.borrow(), &imp.metadata.borrow())
     }
 }
 
