@@ -34,6 +34,7 @@ use gtk::{
 use gtk_macros::action;
 
 use crate::app::MetanoteApplication;
+use crate::config::PROFILE;
 use crate::editor_page::MetanoteEditorPage;
 use crate::metadata::MetadataAgent;
 use crate::row::MetanoteRow;
@@ -95,6 +96,11 @@ mod imp {
             obj.bind_editor_page();
             obj.setup_actions();
             obj.setup_callbacks();
+
+            // Sets a devel style if a development was specified
+            if PROFILE == "development" {
+                obj.add_css_class("devel");
+            }
         }
     }
 

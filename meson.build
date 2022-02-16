@@ -14,6 +14,7 @@ authors     = 'Brian Reading <brian.reading@gmail.com>' # Separate authors by co
 datadir     = join_paths(get_option('prefix'), get_option('datadir'))
 localedir   = join_paths(get_option('prefix'), get_option('localedir'))
 pkgdatadir  = join_paths(datadir, meson.project_name())
+profile     = get_option('profile')
 
 # Import modules
 gnome = import('gnome')

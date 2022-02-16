@@ -3,3 +3,4 @@ pub static AUTHORS: &str = @AUTHORS@;
 pub static APP_ID: &str = @APP_ID@;
 pub static PKGDATADIR: &str = @PKGDATADIR@;
 pub static VERSION: &str = @VERSION@;
+pub static PROFILE: &str = @PROFILE@;
