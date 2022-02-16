@@ -1,0 +1,36 @@
+{
+    "app-id": "com.github.bmreading.Metanote.Devel",
+    "runtime": "org.gnome.Platform",
+    "runtime-version": "master",
+    "sdk": "org.gnome.Sdk",
+    "sdk-extensions": [
+        "org.freedesktop.Sdk.Extension.rust-stable"
+    ],
+    "command": "metanote",
+    "finish-args": [
+        "--socket=wayland",
+        "--socket=session-bus",
+        "--device=dri",
+        "--filesystem=xdg-documents",
+        "--filesystem=xdg-run/gvfsd"
+    ],
+    "build-options": {
+        "append-path": "/usr/lib/sdk/rust-stable/bin",
+        "build-args": [
+            "--share=network"
+        ]
+    },
+    "modules" : [
+        {
+            "name": "metanote",
+            "buildsystem": "meson",
+            "config-opts": [
+                "-Dprofile=development"
+            ],
+            "sources": [{
+                "type": "dir",
+                "path": "../"
+            }]
+        }
+    ]
+}
