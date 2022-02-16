@@ -21,7 +21,7 @@ use adw::prelude::*;
 use adw::subclass::prelude::*;
 use gtk::subclass::prelude::*;
 
-use adw::WindowTitle;
+use adw::{Leaflet, WindowTitle};
 use anyhow::Result;
 use gtk::gio;
 use gtk::gio::{File, FileInfo};
@@ -48,6 +48,8 @@ mod imp {
         pub file_chooser: FileChooserNative,
 
         #[template_child]
+        pub leaflet: TemplateChild<Leaflet>,
+        #[template_child]
         pub content_stack: TemplateChild<Stack>,
         #[template_child]
         pub tracklist: TemplateChild<ListBox>,
@@ -55,6 +57,8 @@ mod imp {
         pub main_title: TemplateChild<WindowTitle>,
         #[template_child]
         pub save_button: TemplateChild<Button>,
+        #[template_child]
+        pub back_button: TemplateChild<Button>,
     }
 
     #[glib::object_subclass]
@@ -74,10 +78,12 @@ mod imp {
 
             Self {
                 file_chooser,
+                leaflet: TemplateChild::default(),
                 content_stack: TemplateChild::default(),
                 tracklist: TemplateChild::default(),
                 main_title: TemplateChild::default(),
                 save_button: TemplateChild::default(),
+                back_button: TemplateChild::default(),
             }
         }
 
@@ -159,6 +165,7 @@ impl MetanoteApplicationWindow {
         imp.tracklist
             .connect_selected_rows_changed(clone!(@weak self as window => move |tracklist| {
                 let content_stack = &window.imp().content_stack;
+                let leaflet = &window.imp().leaflet;
 
                 if tracklist.selected_rows().len() > 0 {
                     let mut selected_tracks = Vec::new();
@@ -170,6 +177,7 @@ impl MetanoteApplicationWindow {
                     let editor_page = content_stack.child_by_name("editor_page").unwrap().downcast::<MetanoteEditorPage>().unwrap();
                     editor_page.set_metadata(&selected_tracks);
                     content_stack.set_visible_child(&editor_page);
+                    leaflet.navigate(adw::NavigationDirection::Forward);
                 } else {
                     content_stack.set_visible_child_name("status_page");
                 }
@@ -183,6 +191,11 @@ impl MetanoteApplicationWindow {
                     Ok(_) => (),
                     Err(e) => log::error!("Failed to save tracks, {}", e),
                 };
+        }));
+
+        imp.back_button
+            .connect_clicked(clone!(@weak self as window => move |_| {
+                window.imp().leaflet.navigate(adw::NavigationDirection::Back);
         }));
     }
 
