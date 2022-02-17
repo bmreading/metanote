@@ -27,7 +27,7 @@ use anyhow::Result;
 use gtk::glib;
 use gtk::glib::clone;
 use gtk::glib::subclass::InitializingObject;
-use gtk::{Box, CompositeTemplate, Entry, Widget};
+use gtk::{Box, CompositeTemplate, Entry, Label, Widget};
 use std::cell::RefCell;
 
 use crate::metadata::{MetadataContainer, MetadataWriteCapable};
@@ -165,7 +165,6 @@ impl MetanoteEditorPage {
             .connect_changed(clone!(@weak self as page => move |album| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 current_metadata.set_album(Some(album.text().to_string()));
-                log::debug!("{:?}", current_metadata);
             }));
 
         self.imp()
@@ -184,6 +183,8 @@ impl MetanoteEditorPage {
                     .art_carousel
                     .append(&art_element.to_picture_widget());
             }
+        } else {
+            self.imp().art_carousel.append(&Label::new(Some("No artwork")));
         }
     }
 
