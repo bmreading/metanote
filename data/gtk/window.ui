@@ -9,8 +9,8 @@
         </section>
     </menu>
     <template class="MetanoteApplicationWindow" parent="AdwApplicationWindow">
-        <property name="default-width">800</property>
-        <property name="default-height">576</property>
+        <property name="default-width">930</property>
+        <property name="default-height">650</property>
         <child>
             <object class="AdwLeaflet" id="leaflet">
                 <property name="can-swipe-back">True</property>
