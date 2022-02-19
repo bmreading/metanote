@@ -32,6 +32,7 @@ pub struct MetadataContainer {
     artist: Option<String>,
     album_artist: Option<String>,
     album: Option<String>,
+    genre: Option<String>,
     year: Option<String>,
     art: Option<Vec<Art>>,
 }
@@ -68,6 +69,13 @@ impl MetadataContainer {
             .all(|c| c.album().eq(&containers[0].album()))
         {
             consolidated_container.album = containers[0].album.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.genre().eq(&containers[0].genre()))
+        {
+            consolidated_container.genre = containers[0].genre.clone();
         }
 
         if containers
@@ -162,6 +170,7 @@ impl MetadataReadCapable for MetadataAgent {
             .artist(tag.artist().map(|a| a.to_string()))
             .album(tag.album().map(|a| a.to_string()))
             .album_artist(tag.get_string(&ItemKey::AlbumArtist).map(|a| a.to_string()))
+            .genre(tag.genre().map(|t| t.to_string()))
             .year(
                 tag.get_string(&ItemKey::RecordingDate)
                     .map(|y| y.to_string()),
@@ -196,6 +205,10 @@ impl MetadataWriteCapable for MetadataAgent {
                 ItemKey::AlbumArtist,
                 ItemValue::Text(album_artist.to_string()),
             ));
+        }
+
+        if let Some(genre) = metadata.genre() {
+            tag.set_genre(genre.to_string())
         }
 
         if let Some(year) = metadata.year() {
