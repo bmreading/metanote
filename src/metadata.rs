@@ -109,7 +109,9 @@ impl Art {
         let stream = gtk::gio::MemoryInputStream::from_bytes(&bytes);
         let pixbuf =
             gtk::gdk_pixbuf::Pixbuf::from_stream(&stream, gtk::gio::Cancellable::NONE).unwrap();
-        gtk::Picture::for_pixbuf(&pixbuf)
+        let picture = gtk::Picture::for_pixbuf(&pixbuf);
+        picture.set_alternative_text(self.description().as_ref().map(|d| d.as_str()));
+        picture
     }
 }
 
