@@ -168,6 +168,13 @@ impl MetanoteEditorPage {
             }));
 
         self.imp()
+            .genre_text
+            .connect_changed(clone!(@weak self as page => move |genre| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_genre(Some(genre.text().to_string()));
+            }));
+
+        self.imp()
             .year_text
             .connect_changed(clone!(@weak self as page => move |year| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
@@ -208,6 +215,8 @@ impl MetanoteEditorPage {
             .set_text(metadata.album_artist().as_ref().unwrap_or(&empty_value));
         imp.album_text
             .set_text(metadata.album().as_ref().unwrap_or(&empty_value));
+        imp.genre_text
+            .set_text(metadata.genre().as_ref().unwrap_or(&empty_value));
         imp.year_text
             .set_text(metadata.year().as_ref().unwrap_or(&empty_value));
     }
