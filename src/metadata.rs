@@ -93,8 +93,9 @@ impl MetadataContainer {
     }
 }
 
-#[derive(Clone, Debug, Getters, PartialEq)]
+#[derive(Builder, Clone, Debug, Getters, PartialEq, Setters)]
 #[get = "pub"]
+#[set = "pub"]
 #[allow(dead_code)]
 pub struct Art {
     description: Option<String>,
@@ -103,6 +104,15 @@ pub struct Art {
 }
 
 impl Art {
+    pub fn from_path(path: &Path) -> Result<Self> {
+        let data = std::fs::read(path)?;
+        Ok(ArtBuilder::default()
+            .description(None)
+            .mime_type("".to_string())
+            .data(data.to_vec())
+            .build()?)
+    }
+
     /// Returns a GTK Picture widget
     pub fn to_picture_widget(&self) -> gtk::Picture {
         let bytes = gtk::glib::Bytes::from(self.data());
