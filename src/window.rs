@@ -123,7 +123,7 @@ glib::wrapper! {
         gtk::ApplicationWindow,
         gtk::Window,
         gtk::Widget,
-    @implements 
+    @implements
         gio::ActionGroup,
         gio::ActionMap,
         gtk::Accessible,
@@ -195,8 +195,8 @@ impl MetanoteApplicationWindow {
 
         imp.back_button
             .connect_clicked(clone!(@weak self as window => move |_| {
-                window.imp().leaflet.navigate(adw::NavigationDirection::Back);
-        }));
+                    window.imp().leaflet.navigate(adw::NavigationDirection::Back);
+            }));
     }
 
     fn add_tracks(&self, dir: &File) {
