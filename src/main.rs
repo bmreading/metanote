@@ -18,6 +18,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
 mod app;
+mod art_button;
 mod config;
 mod editor_page;
 mod metadata;
