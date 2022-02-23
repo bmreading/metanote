@@ -59,7 +59,7 @@ mod imp {
 
 glib::wrapper! {
     pub struct MetanoteApplication(ObjectSubclass<imp::MetanoteApplication>)
-    @extends 
+    @extends
         gio::Application,
         gtk::Application,
         adw::Application,
