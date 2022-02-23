@@ -30,6 +30,7 @@ use gtk::glib::subclass::InitializingObject;
 use gtk::{Box, CompositeTemplate, Entry, Label, Widget};
 use std::cell::RefCell;
 
+use crate::art_button::ArtButton;
 use crate::metadata::{MetadataContainer, MetadataWriteCapable};
 use crate::row::MetanoteRow;
 
@@ -186,12 +187,14 @@ impl MetanoteEditorPage {
         self.clear_art_carousel();
         if let Some(art) = metadata.art() {
             for art_element in art {
-                self.imp()
-                    .art_carousel
-                    .append(&art_element.to_picture_widget());
+                let button = ArtButton::with_art(&art_element);
+
+                self.imp().art_carousel.append(&button);
             }
         } else {
-            self.imp().art_carousel.append(&Label::new(Some("No artwork")));
+            self.imp()
+                .art_carousel
+                .append(&Label::new(Some("No artwork")));
         }
     }
 
@@ -230,7 +233,7 @@ impl MetanoteEditorPage {
         for track in tracks.iter() {
             track.replace_metadata(&metadata_to_write);
             match track.write_metadata(metadata_agent) {
-                Ok(_) => todo!(),
+                Ok(_) => (),
                 Err(e) => log::error!(
                     "failed to write metadata for file at path {} - {}",
                     track.imp().path.borrow().to_str().unwrap(),
