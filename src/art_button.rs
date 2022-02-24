@@ -22,21 +22,23 @@ use gtk::prelude::*;
 use gtk::subclass::prelude::*;
 
 use gtk::glib;
-use gtk::glib::{clone, Object};
+use gtk::glib::{clone, Object, ToValue, Value};
 use gtk::{Button, FileChooserAction, FileChooserNative, ResponseType};
 
-use std::path::PathBuf;
 use std::cell::RefCell;
+use std::ops::Deref;
+use std::path::PathBuf;
 
+use crate::editor_page::MetanoteEditorPage;
 use crate::metadata::Art;
 
 mod imp {
     use super::*;
 
-    #[derive(Default)]
     pub struct ArtButton {
         pub file_chooser: FileChooserNative,
-        pub path: RefCell<PathBuf>,
+        pub path: RefCell<Option<PathBuf>>,
+        pub notifiable: RefCell<Option<Value>>,
     }
 
     #[glib::object_subclass]
@@ -49,11 +51,13 @@ mod imp {
             let file_chooser = FileChooserNative::builder()
                 .modal(true)
                 .action(FileChooserAction::Open)
+                .title("Choose an image")
                 .build();
 
-            Self { 
+            Self {
                 file_chooser,
                 path: Default::default(),
+                notifiable: RefCell::new(None),
             }
         }
     }
@@ -82,18 +86,52 @@ glib::wrapper! {
 }
 
 impl ArtButton {
-    pub fn new() -> Self {
-        Object::new(&[]).expect("Failed to create `ArtButton`.")
+    pub fn new<T>(notifiable: Option<&T>) -> Self
+    where
+        T: ArtButtonChangeNotifiable + ToValue,
+    {
+        if let Some(notifiable) = notifiable {
+            let button: ArtButton =
+                Object::new(&[("label", &"Click to set artwork"), ("hexpand", &true)])
+                    .expect("failed to create `ArtButton`.");
+
+            button
+                .imp()
+                .notifiable
+                .replace(Some(Value::from(notifiable)));
+
+            button
+        } else {
+            Default::default()
+        }
     }
 
-    pub fn with_art(art: &Art) -> Self {
+    pub fn with_art<T>(art: &Art, notifiable: Option<&T>) -> Self
+    where
+        T: ArtButtonChangeNotifiable + ToValue,
+    {
         let picture = art.to_picture_widget();
+        let button: ArtButton =
+            Object::new(&[("child", &picture)]).expect("failed to create `ArtButton`.");
 
-        Object::new(&[("child", &picture)]).expect("Failed to create `ArtButton`.")
+        if let Some(notifiable) = notifiable {
+            button
+                .imp()
+                .notifiable
+                .replace(Some(Value::from(notifiable)));
+        }
+
+        button
     }
 
     fn setup_callbacks(&self) {
         self.connect_clicked(move |button| {
+            let window = button
+                .root()
+                .expect("failed to get art button's root")
+                .downcast::<gtk::ApplicationWindow>()
+                .expect("failed to get art button's application window");
+            button.imp().file_chooser.set_transient_for(Some(&window));
             button.imp().file_chooser.show();
         });
 
@@ -102,10 +140,32 @@ impl ArtButton {
                 if response == ResponseType::Accept {
                     let path = &fc.file().unwrap().path().unwrap();
                     let art = Art::from_path(path).unwrap();
-                    button.imp().path.replace(path.to_path_buf());
+                    button.imp().path.replace(Some(path.to_path_buf()));
                     button.set_child(Some(&art.to_picture_widget()));
+
+                    if let Some(notifiable) =  button.imp().notifiable.borrow().deref() {
+                        // Due to limitations of Value, a concrete type must be specified
+                        // so if expected notifiable type changes, this line must also change
+                        let notifiable = notifiable.get::<MetanoteEditorPage>().expect("failed to get editor page");
+
+                        notifiable.on_art_change();
+                    }
                 }
             }),
         );
     }
+}
+
+impl Default for ArtButton {
+    fn default() -> Self {
+        Object::new(&[]).expect("failed to create `ArtButton`.")
+    }
+}
+
+/// A trait that gives a type the
+/// ability to perform a callback
+/// function when an ArtButton's
+/// art changes
+pub trait ArtButtonChangeNotifiable {
+    fn on_art_change(&self);
 }

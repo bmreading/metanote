@@ -27,11 +27,12 @@ use anyhow::Result;
 use gtk::glib;
 use gtk::glib::clone;
 use gtk::glib::subclass::InitializingObject;
-use gtk::{Box, CompositeTemplate, Entry, Label, Widget};
+use gtk::{Box, CompositeTemplate, Entry, Widget};
 use std::cell::RefCell;
+use std::ops::Deref;
 
-use crate::art_button::ArtButton;
-use crate::metadata::{MetadataContainer, MetadataWriteCapable};
+use crate::art_button::{ArtButton, ArtButtonChangeNotifiable};
+use crate::metadata::{Art, MetadataContainer, MetadataWriteCapable};
 use crate::row::MetanoteRow;
 
 mod imp {
@@ -187,14 +188,12 @@ impl MetanoteEditorPage {
         self.clear_art_carousel();
         if let Some(art) = metadata.art() {
             for art_element in art {
-                let button = ArtButton::with_art(&art_element);
-
-                self.imp().art_carousel.append(&button);
+                self.imp()
+                    .art_carousel
+                    .append(&ArtButton::with_art(&art_element, Some(self)));
             }
         } else {
-            self.imp()
-                .art_carousel
-                .append(&Label::new(Some("No artwork")));
+            self.imp().art_carousel.append(&ArtButton::new(Some(self)));
         }
     }
 
@@ -242,5 +241,27 @@ impl MetanoteEditorPage {
             }
         }
         Ok(())
+    }
+}
+
+impl ArtButtonChangeNotifiable for MetanoteEditorPage {
+    fn on_art_change(&self) {
+        let art_carousel = &self.imp().art_carousel;
+        let mut artwork = Vec::new();
+
+        for i in 0..art_carousel.n_pages() {
+            let art_button = art_carousel.nth_page(i).downcast::<ArtButton>().unwrap();
+
+            match &art_button.imp().path.borrow().deref() {
+                Some(art_path) => {
+                    let art = Art::from_path(art_path).unwrap();
+                    artwork.push(art);
+                }
+                None => {
+                    artwork.pop();
+                }
+            };
+        }
+        self.imp().metadata.borrow_mut().set_art(Some(artwork));
     }
 }
