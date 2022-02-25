@@ -20,7 +20,8 @@
 use anyhow::{Context, Result};
 use derive_builder::Builder;
 use getset::{Getters, Setters};
-use lofty::{Accessor, ItemKey, ItemValue, PictureType, Probe, Tag, TagItem};
+use lofty::{Accessor, ItemKey, ItemValue, PictureType, Probe, Tag, TagExt, TagItem};
+use mime_guess::MimeGuess;
 use std::path::Path;
 
 #[derive(Builder, Clone, Debug, Default, Getters, PartialEq, Setters)]
@@ -106,9 +107,11 @@ pub struct Art {
 impl Art {
     pub fn from_path(path: &Path) -> Result<Self> {
         let data = std::fs::read(path)?;
+        let mime_type = MimeGuess::from_path(path).first_or_text_plain();
+        let mime_type = mime_type.essence_str();
         Ok(ArtBuilder::default()
             .description(None)
-            .mime_type("".to_string())
+            .mime_type(mime_type.into())
             .data(data.to_vec())
             .build()?)
     }
