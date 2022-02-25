@@ -9,7 +9,6 @@ edition = "2021"
 [dependencies]
 adw = { version = "0.1.0", package = "libadwaita" }
 anyhow = "1.0.52"
-async-channel = "1.6.1"
 derive_builder = "0.10.2"
 env_logger = "0.9.0"
 getset = "0.1.2"
