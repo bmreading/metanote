@@ -8,7 +8,6 @@
                 <property name="propagate-natural-width">True</property>
                 <child>
                     <object class="GtkFlowBox">
-                        <property name="homogeneous">True</property>
                         <property name="selection-mode">none</property>
                         <child>
                             <object class="AdwClamp">
@@ -76,7 +75,34 @@
                                                 <child>
                                                     <object class="GtkEntry" id="album_text">
                                                         <property name="valign">center</property>
-                                                </object>
+                                                    </object>
+                                                </child>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Track</property>
+                                                <child>
+                                                    <object class="GtkLabel">
+                                                        <property name="label">Number</property>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkEntry" id="track_number_text">
+                                                        <property name="input-purpose">number</property>
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkLabel">
+                                                        <property name="label">of</property>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkEntry" id="track_total_text">
+                                                        <property name="input-purpose">number</property>
+                                                        <property name="valign">center</property>
+                                                    </object>
                                                 </child>
                                             </object>
                                         </child>
@@ -95,6 +121,63 @@
                                                 <property name="title">Year</property>
                                                 <child>
                                                     <object class="GtkEntry" id="year_text">
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Disc</property>
+                                                <child>
+                                                    <object class="GtkLabel">
+                                                        <property name="label">Number</property>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkEntry" id="disc_number_text">
+                                                        <property name="input-purpose">number</property>
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkLabel">
+                                                        <property name="label">of</property>
+                                                    </object>
+                                                </child>
+                                                <child>
+                                                    <object class="GtkEntry" id="disc_total_text">
+                                                        <property name="input-purpose">number</property>
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Composer</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="composer_text">
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Copyright</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="copyright_text">
+                                                        <property name="valign">center</property>
+                                                    </object>
+                                                </child>
+                                            </object>
+                                        </child>
+                                        <child>
+                                            <object class="AdwActionRow">
+                                                <property name="title">Comment</property>
+                                                <child>
+                                                    <object class="GtkEntry" id="comment_text">
                                                         <property name="valign">center</property>
                                                     </object>
                                                 </child>

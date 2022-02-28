@@ -55,9 +55,23 @@ mod imp {
         #[template_child]
         pub album_text: TemplateChild<Entry>,
         #[template_child]
+        pub track_number_text: TemplateChild<Entry>,
+        #[template_child]
+        pub track_total_text: TemplateChild<Entry>,
+        #[template_child]
         pub genre_text: TemplateChild<Entry>,
         #[template_child]
         pub year_text: TemplateChild<Entry>,
+        #[template_child]
+        pub disc_number_text: TemplateChild<Entry>,
+        #[template_child]
+        pub disc_total_text: TemplateChild<Entry>,
+        #[template_child]
+        pub composer_text: TemplateChild<Entry>,
+        #[template_child]
+        pub copyright_text: TemplateChild<Entry>,
+        #[template_child]
+        pub comment_text: TemplateChild<Entry>,
 
         pub metanote_rows: RefCell<Vec<MetanoteRow>>,
         pub metadata: RefCell<MetadataContainer>,
@@ -77,8 +91,15 @@ mod imp {
                 artist_text: TemplateChild::default(),
                 album_artist_text: TemplateChild::default(),
                 album_text: TemplateChild::default(),
+                track_number_text: TemplateChild::default(),
+                track_total_text: TemplateChild::default(),
                 genre_text: TemplateChild::default(),
                 year_text: TemplateChild::default(),
+                disc_number_text: TemplateChild::default(),
+                disc_total_text: TemplateChild::default(),
+                composer_text: TemplateChild::default(),
+                copyright_text: TemplateChild::default(),
+                comment_text: TemplateChild::default(),
                 metanote_rows: Default::default(),
                 metadata: Default::default(),
             }
@@ -167,7 +188,30 @@ impl MetanoteEditorPage {
             .connect_changed(clone!(@weak self as page => move |album| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 current_metadata.set_album(Some(album.text().to_string()));
-            }));
+            })
+        );
+
+        self.imp()
+            .track_number_text
+            .connect_changed(clone!(@weak self as page => move |track_number| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                match track_number.text().parse::<i32>() {
+                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
+                    Err(_) => ()
+                }
+            })
+        );
+
+        self.imp()
+            .track_total_text
+            .connect_changed(clone!(@weak self as page => move |track_total| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                match track_total.text().parse::<i32>() {
+                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
+                    Err(_) => ()
+                }            
+            })
+        );
 
         self.imp()
             .genre_text
@@ -182,6 +226,52 @@ impl MetanoteEditorPage {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 current_metadata.set_year(Some(year.text().to_string()));
             }));
+
+        self.imp()
+            .disc_number_text
+            .connect_changed(clone!(@weak self as page => move |disc_number| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                match disc_number.text().parse::<i32>() {
+                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
+                    Err(_) => ()
+                }
+            })
+        );
+
+        self.imp()
+            .disc_total_text
+            .connect_changed(clone!(@weak self as page => move |disc_total| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                match disc_total.text().parse::<i32>() {
+                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
+                    Err(_) => ()
+                }            
+            })
+        );
+
+        self.imp()
+            .composer_text
+            .connect_changed(clone!(@weak self as page => move |composer| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_composer(Some(composer.text().to_string()));
+            })
+        );
+
+        self.imp()
+            .copyright_text
+            .connect_changed(clone!(@weak self as page => move |copyright| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_copyright(Some(copyright.text().to_string()));
+            })
+        );
+
+        self.imp()
+            .comment_text
+            .connect_changed(clone!(@weak self as page => move |comment| {
+                let mut current_metadata = page.imp().metadata.borrow_mut();
+                current_metadata.set_comment(Some(comment.text().to_string()));
+            })
+        );
     }
 
     fn set_artwork(&self, metadata: &MetadataContainer) {
@@ -217,10 +307,24 @@ impl MetanoteEditorPage {
             .set_text(metadata.album_artist().as_ref().unwrap_or(&empty_value));
         imp.album_text
             .set_text(metadata.album().as_ref().unwrap_or(&empty_value));
+        imp.track_number_text
+            .set_text(metadata.track_number().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
+        imp.track_total_text
+            .set_text(metadata.track_total().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
         imp.genre_text
             .set_text(metadata.genre().as_ref().unwrap_or(&empty_value));
         imp.year_text
             .set_text(metadata.year().as_ref().unwrap_or(&empty_value));
+        imp.disc_number_text
+            .set_text(metadata.disc_number().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
+        imp.disc_total_text
+            .set_text(metadata.disc_total().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
+        imp.composer_text
+            .set_text(metadata.composer().as_ref().unwrap_or(&empty_value));
+        imp.copyright_text
+            .set_text(metadata.copyright().as_ref().unwrap_or(&empty_value));
+        imp.comment_text
+            .set_text(metadata.comment().as_ref().unwrap_or(&empty_value));
     }
 
     /// Writes metadata to whichever tracks editor has

@@ -33,8 +33,15 @@ pub struct MetadataContainer {
     artist: Option<String>,
     album_artist: Option<String>,
     album: Option<String>,
+    track_number: Option<i32>,
+    track_total: Option<i32>,
     genre: Option<String>,
     year: Option<String>,
+    disc_number: Option<i32>,
+    disc_total: Option<i32>,
+    composer: Option<String>,
+    comment: Option<String>,
+    copyright: Option<String>,
     art: Option<Vec<Art>>,
 }
 
@@ -74,6 +81,20 @@ impl MetadataContainer {
 
         if containers
             .iter()
+            .all(|c| c.track_total().eq(&containers[0].track_total()))
+        {
+            consolidated_container.track_total = containers[0].track_total.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.track_number().eq(&containers[0].track_number()))
+        {
+            consolidated_container.track_number = containers[0].track_number.clone();
+        }
+
+        if containers
+            .iter()
             .all(|c| c.genre().eq(&containers[0].genre()))
         {
             consolidated_container.genre = containers[0].genre.clone();
@@ -84,6 +105,41 @@ impl MetadataContainer {
             .all(|c| c.year().eq(&containers[0].year()))
         {
             consolidated_container.year = containers[0].year.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.disc_number().eq(&containers[0].disc_number()))
+        {
+            consolidated_container.disc_number = containers[0].disc_number.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.disc_total().eq(&containers[0].disc_total()))
+        {
+            consolidated_container.disc_total = containers[0].disc_total.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.composer().eq(&containers[0].composer()))
+        {
+            consolidated_container.composer = containers[0].composer.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.comment().eq(&containers[0].comment()))
+        {
+            consolidated_container.comment = containers[0].comment.clone();
+        }
+
+        if containers
+            .iter()
+            .all(|c| c.copyright().eq(&containers[0].copyright()))
+        {
+            consolidated_container.copyright = containers[0].copyright.clone();
         }
 
         if containers.iter().all(|c| c.art().eq(&containers[0].art())) {
@@ -185,11 +241,18 @@ impl MetadataReadCapable for MetadataAgent {
             .artist(tag.artist().map(|a| a.to_string()))
             .album(tag.album().map(|a| a.to_string()))
             .album_artist(tag.get_string(&ItemKey::AlbumArtist).map(|a| a.to_string()))
+            .track_number(tag.get_string(&ItemKey::TrackNumber).map(|t| t.parse::<i32>().expect("cannot parse track number")))
+            .track_total(tag.get_string(&ItemKey::TrackTotal).map(|t| t.parse::<i32>().expect("cannot parse track total")))
             .genre(tag.genre().map(|t| t.to_string()))
             .year(
                 tag.get_string(&ItemKey::RecordingDate)
                     .map(|y| y.to_string()),
             )
+            .disc_number(tag.get_string(&ItemKey::DiscNumber).map(|d| d.parse::<i32>().expect("cannot parse disc number")))
+            .disc_total(tag.get_string(&ItemKey::DiscTotal).map(|d| d.parse::<i32>().expect("cannot parse disc total")))
+            .composer(tag.get_string(&ItemKey::Composer).map(|c| c.to_string()))
+            .comment(tag.get_string(&ItemKey::Comment).map(|c| c.to_string()))
+            .copyright(tag.get_string(&ItemKey::CopyrightMessage).map(|c| c.to_string()))
             .art(art)
             .build()?)
     }
@@ -222,6 +285,20 @@ impl MetadataWriteCapable for MetadataAgent {
             ));
         }
 
+        if let Some(track_number) = metadata.track_number() {
+            tag.insert_item(TagItem::new(
+                ItemKey::TrackNumber,
+                ItemValue::Text(track_number.to_string()),
+            ));
+        }
+
+        if let Some(track_total) = metadata.track_total() {
+            tag.insert_item(TagItem::new(
+                ItemKey::TrackTotal,
+                ItemValue::Text(track_total.to_string()),
+            ));
+        }
+
         if let Some(genre) = metadata.genre() {
             tag.set_genre(genre.to_string())
         }
@@ -230,6 +307,41 @@ impl MetadataWriteCapable for MetadataAgent {
             tag.insert_item(TagItem::new(
                 ItemKey::RecordingDate,
                 ItemValue::Text(year.to_string()),
+            ));
+        }
+
+        if let Some(disc_number) = metadata.disc_number() {
+            tag.insert_item(TagItem::new(
+                ItemKey::DiscNumber,
+                ItemValue::Text(disc_number.to_string()),
+            ));
+        }
+
+        if let Some(disc_total) = metadata.disc_total() {
+            tag.insert_item(TagItem::new(
+                ItemKey::DiscTotal,
+                ItemValue::Text(disc_total.to_string()),
+            ));
+        }
+
+        if let Some(composer) = metadata.composer() {
+            tag.insert_item(TagItem::new(
+                ItemKey::Composer,
+                ItemValue::Text(composer.to_string()),
+            ));
+        }
+
+        if let Some(comment) = metadata.comment() {
+            tag.insert_item(TagItem::new(
+                ItemKey::Comment,
+                ItemValue::Text(comment.to_string()),
+            ));
+        }
+
+        if let Some(copyright) = metadata.copyright() {
+            tag.insert_item(TagItem::new(
+                ItemKey::CopyrightMessage,
+                ItemValue::Text(copyright.to_string()),
             ));
         }
 
