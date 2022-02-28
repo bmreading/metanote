@@ -11,7 +11,7 @@
                         <property name="selection-mode">none</property>
                         <child>
                             <object class="AdwClamp">
-                                <property name="maximum-size">300</property>
+                                <property name="maximum-size">325</property>
                                 <property name="valign">center</property>
                                 <property name="halign">fill</property>
                                 <child>
@@ -20,8 +20,8 @@
                                         <property name="margin-end">20</property>
                                         <property name="margin-top">20</property>
                                         <property name="margin-bottom">20</property>
-                                        <property name="width-request">200</property>
-                                        <property name="height-request">200</property>
+                                        <property name="width-request">325</property>
+                                        <property name="height-request">325</property>
                                         <property name="valign">center</property>
                                         <style>
                                             <class name="card" />
@@ -32,7 +32,7 @@
                         </child>
                         <child>
                             <object class="AdwClamp">
-                                <property name="maximum-size">500</property>
+                                <property name="maximum-size">800</property>
                                 <child>
                                     <object class="AdwPreferencesGroup" id="tag_row_group">
                                         <property name="margin-start">20</property>
