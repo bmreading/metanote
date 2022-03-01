@@ -361,7 +361,7 @@ impl MetadataAgent {
         if let Some(art) = art_items {
             for art_item in art {
                 if art_item.description().is_some() {
-                    let mut picture_type = PictureType::Other;
+                    let mut picture_type = PictureType::CoverFront;
                     if art_item.description().as_ref().unwrap() == "cover" {
                         picture_type = PictureType::CoverFront
                     };
@@ -374,9 +374,9 @@ impl MetadataAgent {
                     ));
                 } else {
                     tag.push_picture(lofty::Picture::new_unchecked(
-                        PictureType::Other,
+                        PictureType::CoverFront,
                         lofty::MimeType::from_str(art_item.mime_type()),
-                        None,
+                        Some("Cover (front)".to_string()),
                         art_item.data().to_vec(),
                     ));
                 }
