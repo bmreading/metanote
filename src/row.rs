@@ -124,12 +124,17 @@ impl MetanoteRow {
             .comment(self.replace_tag(current.borrow().comment(), new.comment()))
             .copyright(self.replace_tag(current.borrow().copyright(), new.copyright()))
             .art(new.art().to_owned())
-            .build().unwrap();
+            .build()
+            .unwrap();
 
         self.imp().metadata.replace(replacement_metadata);
     }
 
-    fn replace_tag(&self, current_tag: &Option<String>, new_tag: &Option<String>) -> Option<String> {
+    fn replace_tag(
+        &self,
+        current_tag: &Option<String>,
+        new_tag: &Option<String>,
+    ) -> Option<String> {
         if new_tag == &Some(String::from("<Keep>")) {
             current_tag.to_owned()
         } else {
