@@ -342,9 +342,7 @@ impl MetadataWriteCapable for MetadataAgent {
 impl MetadataAgent {
     fn write_text_value(&self, tag: &mut Tag, tag_item: (ItemKey, &Option<String>)) {
         if let Some(value) = tag_item.1 {
-            if value != "<Keep>" && value != "-1" {
-                tag.insert_item(TagItem::new(tag_item.0, ItemValue::Text(value.to_string())));
-            }
+            tag.insert_item(TagItem::new(tag_item.0, ItemValue::Text(value.to_string())));
         }
     }
 
