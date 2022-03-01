@@ -14,6 +14,6 @@ env_logger = "0.9.0"
 getset = "0.1.2"
 gtk = { version = "0.4.2", package = "gtk4" }
 gtk-macros = "0.3.0"
-lofty = { git = "https://github.com/Serial-ATA/lofty-rs.git" }
+lofty = "0.5.2"
 log = "0.4.14"
 mime_guess = "2.0.4"
