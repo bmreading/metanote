@@ -105,9 +105,44 @@ impl MetanoteRow {
         format!("{artist} - {title}")
     }
 
-    /// Replaces metadata in row by cloning a MetadataContainer reference
     pub fn replace_metadata(&self, metadata: &MetadataContainer) {
-        self.imp().metadata.replace(metadata.clone());
+        let current = &self.imp().metadata;
+        let new = metadata;
+
+        let replacement_metadata = crate::metadata::MetadataContainerBuilder::default()
+            .title(self.replace_tag(current.borrow().title(), new.title()))
+            .artist(self.replace_tag(current.borrow().artist(), new.artist()))
+            .album_artist(self.replace_tag(current.borrow().album_artist(), new.album_artist()))
+            .album(self.replace_tag(current.borrow().album(), new.album()))
+            .track_number(self.replace_num_tag(current.borrow().track_number(), new.track_number()))
+            .track_total(self.replace_num_tag(current.borrow().track_total(), new.track_total()))
+            .genre(self.replace_tag(current.borrow().genre(), new.genre()))
+            .year(self.replace_tag(current.borrow().year(), new.year()))
+            .disc_number(self.replace_num_tag(current.borrow().disc_number(), new.disc_number()))
+            .disc_total(self.replace_num_tag(current.borrow().disc_total(), new.disc_total()))
+            .composer(self.replace_tag(current.borrow().composer(), new.composer()))
+            .comment(self.replace_tag(current.borrow().comment(), new.comment()))
+            .copyright(self.replace_tag(current.borrow().copyright(), new.copyright()))
+            .art(new.art().to_owned())
+            .build().unwrap();
+
+        self.imp().metadata.replace(replacement_metadata);
+    }
+
+    fn replace_tag(&self, current_tag: &Option<String>, new_tag: &Option<String>) -> Option<String> {
+        if new_tag == &Some(String::from("<Keep>")) {
+            current_tag.to_owned()
+        } else {
+            new_tag.to_owned()
+        }
+    }
+
+    fn replace_num_tag(&self, current_tag: &Option<i32>, new_tag: &Option<i32>) -> Option<i32> {
+        if new_tag == &Some(-1) {
+            current_tag.to_owned()
+        } else {
+            new_tag.to_owned()
+        }
     }
 
     /// Writes to file whatever metadata that the row holds
