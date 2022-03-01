@@ -47,9 +47,27 @@ pub struct MetadataContainer {
 
 impl MetadataContainer {
     /// Returns a single MetadataContainer consolidated with matching fields.
-    /// Non-matching fields are None
+    /// Non-matching fields are filled with "<Keep>" or -1
     pub fn merge(containers: &[Self]) -> Self {
-        let mut consolidated_container = Self::default();
+        // let mut consolidated_container = Self::default();
+
+        let mut consolidated_container = MetadataContainerBuilder::default()
+            .title(Some(String::from("<Keep>")))
+            .artist(Some(String::from("<Keep>")))
+            .album_artist(Some(String::from("<Keep>")))
+            .album(Some(String::from("<Keep>")))
+            .track_number(Some(-1))
+            .track_total(Some(-1))
+            .genre(Some(String::from("<Keep>")))
+            .year(Some(String::from("<Keep>")))
+            .disc_number(Some(-1))
+            .disc_total(Some(-1))
+            .composer(Some(String::from("<Keep>")))
+            .copyright(Some(String::from("<Keep>")))
+            .comment(Some(String::from("<Keep>")))
+            .art(Default::default())
+            .build()
+            .expect("failed to build consolidated container");
 
         if containers
             .iter()
@@ -241,18 +259,33 @@ impl MetadataReadCapable for MetadataAgent {
             .artist(tag.artist().map(|a| a.to_string()))
             .album(tag.album().map(|a| a.to_string()))
             .album_artist(tag.get_string(&ItemKey::AlbumArtist).map(|a| a.to_string()))
-            .track_number(tag.get_string(&ItemKey::TrackNumber).map(|t| t.parse::<i32>().expect("cannot parse track number")))
-            .track_total(tag.get_string(&ItemKey::TrackTotal).map(|t| t.parse::<i32>().expect("cannot parse track total")))
+            .track_number(
+                tag.get_string(&ItemKey::TrackNumber)
+                    .map(|t| t.parse::<i32>().expect("cannot parse track number")),
+            )
+            .track_total(
+                tag.get_string(&ItemKey::TrackTotal)
+                    .map(|t| t.parse::<i32>().expect("cannot parse track total")),
+            )
             .genre(tag.genre().map(|t| t.to_string()))
             .year(
                 tag.get_string(&ItemKey::RecordingDate)
                     .map(|y| y.to_string()),
             )
-            .disc_number(tag.get_string(&ItemKey::DiscNumber).map(|d| d.parse::<i32>().expect("cannot parse disc number")))
-            .disc_total(tag.get_string(&ItemKey::DiscTotal).map(|d| d.parse::<i32>().expect("cannot parse disc total")))
+            .disc_number(
+                tag.get_string(&ItemKey::DiscNumber)
+                    .map(|d| d.parse::<i32>().expect("cannot parse disc number")),
+            )
+            .disc_total(
+                tag.get_string(&ItemKey::DiscTotal)
+                    .map(|d| d.parse::<i32>().expect("cannot parse disc total")),
+            )
             .composer(tag.get_string(&ItemKey::Composer).map(|c| c.to_string()))
             .comment(tag.get_string(&ItemKey::Comment).map(|c| c.to_string()))
-            .copyright(tag.get_string(&ItemKey::CopyrightMessage).map(|c| c.to_string()))
+            .copyright(
+                tag.get_string(&ItemKey::CopyrightMessage)
+                    .map(|c| c.to_string()),
+            )
             .art(art)
             .build()?)
     }
@@ -266,85 +299,56 @@ impl MetadataWriteCapable for MetadataAgent {
             .primary_tag_mut()
             .context("primary tag unable to be found")?;
 
-        if let Some(title) = metadata.title() {
-            tag.set_title(title.to_string())
-        }
-
-        if let Some(artist) = metadata.artist() {
-            tag.set_artist(artist.to_string())
-        }
-
-        if let Some(album) = metadata.album() {
-            tag.set_album(album.to_string())
-        }
-
-        if let Some(album_artist) = metadata.album_artist() {
-            tag.insert_item(TagItem::new(
-                ItemKey::AlbumArtist,
-                ItemValue::Text(album_artist.to_string()),
-            ));
-        }
-
-        if let Some(track_number) = metadata.track_number() {
-            tag.insert_item(TagItem::new(
+        let tag_items = [
+            (ItemKey::TrackTitle, metadata.title()),
+            (ItemKey::TrackArtist, metadata.artist()),
+            (ItemKey::AlbumTitle, metadata.album()),
+            (ItemKey::AlbumArtist, metadata.album_artist()),
+            (
                 ItemKey::TrackNumber,
-                ItemValue::Text(track_number.to_string()),
-            ));
-        }
-
-        if let Some(track_total) = metadata.track_total() {
-            tag.insert_item(TagItem::new(
+                &metadata.track_number().map(|t| t.to_string()),
+            ),
+            (
                 ItemKey::TrackTotal,
-                ItemValue::Text(track_total.to_string()),
-            ));
-        }
-
-        if let Some(genre) = metadata.genre() {
-            tag.set_genre(genre.to_string())
-        }
-
-        if let Some(year) = metadata.year() {
-            tag.insert_item(TagItem::new(
-                ItemKey::RecordingDate,
-                ItemValue::Text(year.to_string()),
-            ));
-        }
-
-        if let Some(disc_number) = metadata.disc_number() {
-            tag.insert_item(TagItem::new(
+                &metadata.track_total().map(|t| t.to_string()),
+            ),
+            (ItemKey::Genre, metadata.genre()),
+            (ItemKey::Year, metadata.year()),
+            (
                 ItemKey::DiscNumber,
-                ItemValue::Text(disc_number.to_string()),
-            ));
-        }
-
-        if let Some(disc_total) = metadata.disc_total() {
-            tag.insert_item(TagItem::new(
+                &metadata.disc_number().map(|t| t.to_string()),
+            ),
+            (
                 ItemKey::DiscTotal,
-                ItemValue::Text(disc_total.to_string()),
-            ));
+                &metadata.disc_total().map(|t| t.to_string()),
+            ),
+            (ItemKey::Composer, metadata.composer()),
+            (ItemKey::CopyrightMessage, metadata.copyright()),
+            (ItemKey::Comment, metadata.comment()),
+        ];
+
+        for tag_item in tag_items {
+            self.write_text_value(tag, tag_item);
         }
 
-        if let Some(composer) = metadata.composer() {
-            tag.insert_item(TagItem::new(
-                ItemKey::Composer,
-                ItemValue::Text(composer.to_string()),
-            ));
-        }
+        self.write_art(tag, metadata.art());
 
-        if let Some(comment) = metadata.comment() {
-            tag.insert_item(TagItem::new(
-                ItemKey::Comment,
-                ItemValue::Text(comment.to_string()),
-            ));
-        }
+        tag.save_to_path(path)?;
 
-        if let Some(copyright) = metadata.copyright() {
-            tag.insert_item(TagItem::new(
-                ItemKey::CopyrightMessage,
-                ItemValue::Text(copyright.to_string()),
-            ));
-        }
+        Ok(())
+    }
+}
 
+impl MetadataAgent {
+    fn write_text_value(&self, tag: &mut Tag, tag_item: (ItemKey, &Option<String>)) {
+        if let Some(value) = tag_item.1 {
+            if value != "<Keep>" && value != "-1" {
+                tag.insert_item(TagItem::new(tag_item.0, ItemValue::Text(value.to_string())));
+            }
+        }
+    }
+
+    fn write_art(&self, tag: &mut Tag, art_items: &Option<Vec<Art>>) {
         let mut pic_types = Vec::new();
         for existing_picture in tag.pictures() {
             pic_types.push(existing_picture.pic_type());
@@ -356,7 +360,7 @@ impl MetadataWriteCapable for MetadataAgent {
             tag.remove_picture_type(pic_type);
         }
 
-        if let Some(art) = metadata.art() {
+        if let Some(art) = art_items {
             for art_item in art {
                 if art_item.description().is_some() {
                     let mut picture_type = PictureType::Other;
@@ -380,9 +384,5 @@ impl MetadataWriteCapable for MetadataAgent {
                 }
             }
         }
-
-        tag.save_to_path(path)?;
-
-        Ok(())
     }
 }

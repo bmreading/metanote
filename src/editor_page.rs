@@ -165,15 +165,17 @@ impl MetanoteEditorPage {
         self.imp()
             .title_text
             .connect_changed(clone!(@weak self as page => move |title| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_title(Some(title.text().to_string()));
+                    let mut current_metadata = page.imp().metadata.borrow_mut();
+                    current_metadata.set_title(Some(title.text().to_string()));
+
             }));
 
         self.imp()
             .artist_text
             .connect_changed(clone!(@weak self as page => move |artist| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_artist(Some(artist.text().to_string()));
+                    let mut current_metadata = page.imp().metadata.borrow_mut();
+                    current_metadata.set_artist(Some(artist.text().to_string()));
+
             }));
 
         self.imp().album_artist_text.connect_changed(
@@ -188,90 +190,88 @@ impl MetanoteEditorPage {
             .connect_changed(clone!(@weak self as page => move |album| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 current_metadata.set_album(Some(album.text().to_string()));
-            })
-        );
+            }));
 
-        self.imp()
-            .track_number_text
-            .connect_changed(clone!(@weak self as page => move |track_number| {
+        self.imp().track_number_text.connect_changed(
+            clone!(@weak self as page => move |track_number| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 match track_number.text().parse::<i32>() {
                     Ok(number) => { current_metadata.set_track_number(Some(number)); },
                     Err(_) => ()
                 }
-            })
+            }),
         );
 
-        self.imp()
-            .track_total_text
-            .connect_changed(clone!(@weak self as page => move |track_total| {
+        self.imp().track_total_text.connect_changed(
+            clone!(@weak self as page => move |track_total| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 match track_total.text().parse::<i32>() {
                     Ok(number) => { current_metadata.set_track_number(Some(number)); },
                     Err(_) => ()
-                }            
-            })
+                }
+            }),
         );
 
         self.imp()
             .genre_text
             .connect_changed(clone!(@weak self as page => move |genre| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_genre(Some(genre.text().to_string()));
+                    let mut current_metadata = page.imp().metadata.borrow_mut();
+                    current_metadata.set_genre(Some(genre.text().to_string()));
             }));
 
         self.imp()
             .year_text
             .connect_changed(clone!(@weak self as page => move |year| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_year(Some(year.text().to_string()));
+                    let mut current_metadata = page.imp().metadata.borrow_mut();
+                    current_metadata.set_year(Some(year.text().to_string()));
             }));
 
-        self.imp()
-            .disc_number_text
-            .connect_changed(clone!(@weak self as page => move |disc_number| {
+        self.imp().disc_number_text.connect_changed(
+            clone!(@weak self as page => move |disc_number| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 match disc_number.text().parse::<i32>() {
                     Ok(number) => { current_metadata.set_track_number(Some(number)); },
                     Err(_) => ()
                 }
-            })
+            }),
         );
 
-        self.imp()
-            .disc_total_text
-            .connect_changed(clone!(@weak self as page => move |disc_total| {
+        self.imp().disc_total_text.connect_changed(
+            clone!(@weak self as page => move |disc_total| {
                 let mut current_metadata = page.imp().metadata.borrow_mut();
                 match disc_total.text().parse::<i32>() {
                     Ok(number) => { current_metadata.set_track_number(Some(number)); },
                     Err(_) => ()
-                }            
-            })
+                }
+            }),
         );
 
         self.imp()
             .composer_text
             .connect_changed(clone!(@weak self as page => move |composer| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_composer(Some(composer.text().to_string()));
-            })
-        );
+                if  composer.placeholder_text().is_none() {
+                    let mut current_metadata = page.imp().metadata.borrow_mut();
+                    current_metadata.set_composer(Some(composer.text().to_string()));
+                }
+            }));
 
         self.imp()
             .copyright_text
             .connect_changed(clone!(@weak self as page => move |copyright| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_copyright(Some(copyright.text().to_string()));
-            })
-        );
+                if  copyright.placeholder_text().is_none() {
+                    let mut current_metadata = page.imp().metadata.borrow_mut();
+                    current_metadata.set_copyright(Some(copyright.text().to_string()));
+                }
+            }));
 
         self.imp()
             .comment_text
             .connect_changed(clone!(@weak self as page => move |comment| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_comment(Some(comment.text().to_string()));
-            })
-        );
+                if comment.placeholder_text().is_none() {
+                    let mut current_metadata = page.imp().metadata.borrow_mut();
+                    current_metadata.set_comment(Some(comment.text().to_string()));
+                }
+            }));
     }
 
     fn set_artwork(&self, metadata: &MetadataContainer) {
@@ -298,33 +298,66 @@ impl MetanoteEditorPage {
 
     fn set_textual_tags(&self, metadata: &MetadataContainer) {
         let imp = self.imp();
-        let empty_value = String::from("");
-        imp.title_text
-            .set_text(metadata.title().as_ref().unwrap_or(&empty_value));
-        imp.artist_text
-            .set_text(metadata.artist().as_ref().unwrap_or(&empty_value));
-        imp.album_artist_text
-            .set_text(metadata.album_artist().as_ref().unwrap_or(&empty_value));
-        imp.album_text
-            .set_text(metadata.album().as_ref().unwrap_or(&empty_value));
-        imp.track_number_text
-            .set_text(metadata.track_number().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
-        imp.track_total_text
-            .set_text(metadata.track_total().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
-        imp.genre_text
-            .set_text(metadata.genre().as_ref().unwrap_or(&empty_value));
-        imp.year_text
-            .set_text(metadata.year().as_ref().unwrap_or(&empty_value));
-        imp.disc_number_text
-            .set_text(metadata.disc_number().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
-        imp.disc_total_text
-            .set_text(metadata.disc_total().map(|t| t.to_string()).as_ref().unwrap_or(&empty_value));
-        imp.composer_text
-            .set_text(metadata.composer().as_ref().unwrap_or(&empty_value));
-        imp.copyright_text
-            .set_text(metadata.copyright().as_ref().unwrap_or(&empty_value));
-        imp.comment_text
-            .set_text(metadata.comment().as_ref().unwrap_or(&empty_value));
+
+        let tags = [
+            (&imp.title_text, TagValue::Text(metadata.title())),
+            (&imp.artist_text, TagValue::Text(metadata.artist())),
+            (
+                &imp.album_artist_text,
+                TagValue::Text(metadata.album_artist()),
+            ),
+            (
+                &imp.track_number_text,
+                TagValue::Number(metadata.track_number()),
+            ),
+            (
+                &imp.track_total_text,
+                TagValue::Number(metadata.track_total()),
+            ),
+            (&imp.genre_text, TagValue::Text(metadata.genre())),
+            (&imp.year_text, TagValue::Text(metadata.year())),
+            (
+                &imp.disc_number_text,
+                TagValue::Number(metadata.disc_number()),
+            ),
+            (
+                &imp.disc_total_text,
+                TagValue::Number(metadata.disc_total()),
+            ),
+            (&imp.composer_text, TagValue::Text(metadata.composer())),
+            (&imp.copyright_text, TagValue::Text(metadata.copyright())),
+            (&imp.comment_text, TagValue::Text(metadata.comment())),
+        ];
+
+        for tag in tags {
+            self.set_text_value(tag.0, tag.1);
+        }
+    }
+
+    fn set_text_value(&self, entry: &TemplateChild<Entry>, tag_value: TagValue) {
+        let empty_val = String::from("");
+
+        match tag_value {
+            TagValue::Text(v) => {
+                if let Some(v) = v {
+                    if v == "<Keep>" {
+                        entry.set_placeholder_text(Some(v));
+                        entry.set_text("");
+                    } else {
+                        entry.set_text(v);
+                    }
+                }
+            }
+            TagValue::Number(v) => {
+                let v = v.map(|n| n.to_string()).unwrap_or(empty_val);
+                if v == "-1" {
+                    entry.set_text("");
+                    entry.set_placeholder_text(Some("<Keep>"));
+                } else {
+                    entry.set_text(&v);
+                }
+            }
+        }
     }
 
     /// Writes metadata to whichever tracks editor has
@@ -368,4 +401,9 @@ impl ArtButtonChangeNotifiable for MetanoteEditorPage {
         }
         self.imp().metadata.borrow_mut().set_art(Some(artwork));
     }
+}
+
+enum TagValue<'a> {
+    Text(&'a Option<String>),
+    Number(&'a Option<i32>),
 }
