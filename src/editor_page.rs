@@ -302,6 +302,7 @@ impl MetanoteEditorPage {
         let tags = [
             (&imp.title_text, TagValue::Text(metadata.title())),
             (&imp.artist_text, TagValue::Text(metadata.artist())),
+            (&imp.album_text, TagValue::Text(metadata.album())),
             (
                 &imp.album_artist_text,
                 TagValue::Text(metadata.album_artist()),
