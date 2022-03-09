@@ -136,7 +136,7 @@ impl MetanoteRow {
         new_tag: &Option<String>,
     ) -> Option<String> {
         if new_tag == &Some(String::from("<Keep>")) {
-            current_tag.to_owned()
+            current_tag.to_owned() // Don't try to write a "<Keep>" value
         } else {
             new_tag.to_owned()
         }
@@ -144,7 +144,7 @@ impl MetanoteRow {
 
     fn replace_num_tag(&self, current_tag: &Option<i32>, new_tag: &Option<i32>) -> Option<i32> {
         if new_tag == &Some(-1) {
-            current_tag.to_owned()
+            current_tag.to_owned() // Don't try to write a -1 value
         } else {
             new_tag.to_owned()
         }
