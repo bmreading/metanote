@@ -25,7 +25,6 @@ use gtk::subclass::prelude::*;
 use adw::{Carousel, PreferencesGroup};
 use anyhow::Result;
 use gtk::glib;
-use gtk::glib::clone;
 use gtk::glib::subclass::InitializingObject;
 use gtk::{Box, CompositeTemplate, Entry, Widget};
 use std::cell::RefCell;
@@ -114,13 +113,7 @@ mod imp {
         }
     }
 
-    impl ObjectImpl for MetanoteEditorPage {
-        fn constructed(&self, obj: &Self::Type) {
-            self.parent_constructed(obj);
-            obj.setup_callbacks();
-        }
-    }
-
+    impl ObjectImpl for MetanoteEditorPage {}
     impl WidgetImpl for MetanoteEditorPage {}
     impl BoxImpl for MetanoteEditorPage {}
 }
@@ -161,119 +154,6 @@ impl MetanoteEditorPage {
         }
     }
 
-    fn setup_callbacks(&self) {
-        self.imp()
-            .title_text
-            .connect_changed(clone!(@weak self as page => move |title| {
-                    let mut current_metadata = page.imp().metadata.borrow_mut();
-                    current_metadata.set_title(Some(title.text().to_string()));
-
-            }));
-
-        self.imp()
-            .artist_text
-            .connect_changed(clone!(@weak self as page => move |artist| {
-                    let mut current_metadata = page.imp().metadata.borrow_mut();
-                    current_metadata.set_artist(Some(artist.text().to_string()));
-
-            }));
-
-        self.imp().album_artist_text.connect_changed(
-            clone!(@weak self as page => move |album_artist| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_album_artist(Some(album_artist.text().to_string()));
-            }),
-        );
-
-        self.imp()
-            .album_text
-            .connect_changed(clone!(@weak self as page => move |album| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                current_metadata.set_album(Some(album.text().to_string()));
-            }));
-
-        self.imp().track_number_text.connect_changed(
-            clone!(@weak self as page => move |track_number| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                match track_number.text().parse::<i32>() {
-                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
-                    Err(_) => ()
-                }
-            }),
-        );
-
-        self.imp().track_total_text.connect_changed(
-            clone!(@weak self as page => move |track_total| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                match track_total.text().parse::<i32>() {
-                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
-                    Err(_) => ()
-                }
-            }),
-        );
-
-        self.imp()
-            .genre_text
-            .connect_changed(clone!(@weak self as page => move |genre| {
-                    let mut current_metadata = page.imp().metadata.borrow_mut();
-                    current_metadata.set_genre(Some(genre.text().to_string()));
-            }));
-
-        self.imp()
-            .year_text
-            .connect_changed(clone!(@weak self as page => move |year| {
-                    let mut current_metadata = page.imp().metadata.borrow_mut();
-                    current_metadata.set_year(Some(year.text().to_string()));
-            }));
-
-        self.imp().disc_number_text.connect_changed(
-            clone!(@weak self as page => move |disc_number| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                match disc_number.text().parse::<i32>() {
-                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
-                    Err(_) => ()
-                }
-            }),
-        );
-
-        self.imp().disc_total_text.connect_changed(
-            clone!(@weak self as page => move |disc_total| {
-                let mut current_metadata = page.imp().metadata.borrow_mut();
-                match disc_total.text().parse::<i32>() {
-                    Ok(number) => { current_metadata.set_track_number(Some(number)); },
-                    Err(_) => ()
-                }
-            }),
-        );
-
-        self.imp()
-            .composer_text
-            .connect_changed(clone!(@weak self as page => move |composer| {
-                if  composer.placeholder_text().is_none() {
-                    let mut current_metadata = page.imp().metadata.borrow_mut();
-                    current_metadata.set_composer(Some(composer.text().to_string()));
-                }
-            }));
-
-        self.imp()
-            .copyright_text
-            .connect_changed(clone!(@weak self as page => move |copyright| {
-                if  copyright.placeholder_text().is_none() {
-                    let mut current_metadata = page.imp().metadata.borrow_mut();
-                    current_metadata.set_copyright(Some(copyright.text().to_string()));
-                }
-            }));
-
-        self.imp()
-            .comment_text
-            .connect_changed(clone!(@weak self as page => move |comment| {
-                if comment.placeholder_text().is_none() {
-                    let mut current_metadata = page.imp().metadata.borrow_mut();
-                    current_metadata.set_comment(Some(comment.text().to_string()));
-                }
-            }));
-    }
-
     fn set_artwork(&self, metadata: &MetadataContainer) {
         self.clear_art_carousel();
         if let Some(art) = metadata.art() {
@@ -300,34 +180,34 @@ impl MetanoteEditorPage {
         let imp = self.imp();
 
         let tags = [
-            (&imp.title_text, TagValue::Text(metadata.title())),
-            (&imp.artist_text, TagValue::Text(metadata.artist())),
-            (&imp.album_text, TagValue::Text(metadata.album())),
+            (&imp.title_text, EntryValue::Text(metadata.title())),
+            (&imp.artist_text, EntryValue::Text(metadata.artist())),
+            (&imp.album_text, EntryValue::Text(metadata.album())),
             (
                 &imp.album_artist_text,
-                TagValue::Text(metadata.album_artist()),
+                EntryValue::Text(metadata.album_artist()),
             ),
             (
                 &imp.track_number_text,
-                TagValue::Number(metadata.track_number()),
+                EntryValue::Number(metadata.track_number()),
             ),
             (
                 &imp.track_total_text,
-                TagValue::Number(metadata.track_total()),
+                EntryValue::Number(metadata.track_total()),
             ),
-            (&imp.genre_text, TagValue::Text(metadata.genre())),
-            (&imp.year_text, TagValue::Text(metadata.year())),
+            (&imp.genre_text, EntryValue::Text(metadata.genre())),
+            (&imp.year_text, EntryValue::Text(metadata.year())),
             (
                 &imp.disc_number_text,
-                TagValue::Number(metadata.disc_number()),
+                EntryValue::Number(metadata.disc_number()),
             ),
             (
                 &imp.disc_total_text,
-                TagValue::Number(metadata.disc_total()),
+                EntryValue::Number(metadata.disc_total()),
             ),
-            (&imp.composer_text, TagValue::Text(metadata.composer())),
-            (&imp.copyright_text, TagValue::Text(metadata.copyright())),
-            (&imp.comment_text, TagValue::Text(metadata.comment())),
+            (&imp.composer_text, EntryValue::Text(metadata.composer())),
+            (&imp.copyright_text, EntryValue::Text(metadata.copyright())),
+            (&imp.comment_text, EntryValue::Text(metadata.comment())),
         ];
 
         for tag in tags {
@@ -335,27 +215,35 @@ impl MetanoteEditorPage {
         }
     }
 
-    fn set_text_value(&self, entry: &TemplateChild<Entry>, tag_value: TagValue) {
-        let empty_val = String::from("");
-
-        match tag_value {
-            TagValue::Text(v) => {
-                if let Some(v) = v {
-                    if v == "<Keep>" {
-                        entry.set_placeholder_text(Some(v));
-                        entry.set_text("");
-                    } else {
-                        entry.set_text(v);
+    fn set_text_value(&self, entry: &TemplateChild<Entry>, entry_value: EntryValue) {
+        entry.set_placeholder_text(None);
+        
+        match entry_value {
+            EntryValue::Text(v) => {
+                match v {
+                    Some(v) => {
+                        if v == "<Keep>" {
+                            entry.set_placeholder_text(Some(v));
+                            entry.set_text("");
+                        } else {
+                            entry.set_text(v);
+                        }
                     }
+                    None => { entry.set_text("") },
                 }
             }
-            TagValue::Number(v) => {
-                let v = v.map(|n| n.to_string()).unwrap_or(empty_val);
-                if v == "-1" {
-                    entry.set_text("");
-                    entry.set_placeholder_text(Some("<Keep>"));
-                } else {
-                    entry.set_text(&v);
+            EntryValue::Number(v) => {
+                match v {
+                    Some(v) => {
+                        let v = v.to_string();
+                        if v == "-1" {
+                            entry.set_text("");
+                            entry.set_placeholder_text(Some("<Keep>"));
+                        } else {
+                            entry.set_text(&v);
+                        }
+                    }
+                    None => { entry.set_text("") }
                 }
             }
         }
@@ -363,12 +251,13 @@ impl MetanoteEditorPage {
 
     /// Writes metadata to whichever tracks editor has
     pub fn write_metadata<T: MetadataWriteCapable>(&self, metadata_agent: &T) -> Result<()> {
+        self.update_metadata();
         let imp = self.imp();
         let tracks = imp.metanote_rows.borrow();
-        let metadata_to_write = imp.metadata.borrow();
+        let current_metadata = imp.metadata.borrow();
 
         for track in tracks.iter() {
-            track.replace_metadata(&metadata_to_write);
+            track.replace_metadata(&current_metadata);
             match track.write_metadata(metadata_agent) {
                 Ok(_) => (),
                 Err(e) => log::error!(
@@ -379,6 +268,59 @@ impl MetanoteEditorPage {
             }
         }
         Ok(())
+    }
+
+
+    // Replace instance's metadata with what has been modified in UI
+    fn update_metadata(&self) {
+
+        let updated_metadata = crate::metadata::MetadataContainerBuilder::default()
+            .title(StringOption::from(&self.imp().title_text).0)
+            .artist(StringOption::from(&self.imp().artist_text).0)
+            .album_artist(StringOption::from(&self.imp().album_artist_text).0)
+            .album(StringOption::from(&self.imp().album_text).0)
+            .track_number(I32Option::from(&self.imp().track_number_text).0)
+            .track_total(I32Option::from(&self.imp().track_total_text).0)
+            .genre(StringOption::from(&self.imp().genre_text).0)
+            .year(StringOption::from(&self.imp().year_text).0)
+            .disc_number(I32Option::from(&self.imp().disc_number_text).0)
+            .disc_total(I32Option::from(&self.imp().disc_total_text).0)
+            .composer(StringOption::from(&self.imp().composer_text).0)
+            .comment(StringOption::from(&self.imp().comment_text).0)
+            .copyright(StringOption::from(&self.imp().copyright_text).0)
+            .art(self.imp().metadata.take().art().to_owned())
+            .build()
+            .unwrap();
+
+        self.imp().metadata.replace(updated_metadata);
+    }
+}
+
+// Struct to wrap an Option<String> so we can add traits to it
+struct StringOption(Option<String>);
+impl From<&TemplateChild<Entry>> for StringOption {
+    fn from(entry: &TemplateChild<Entry>) -> Self {
+        if entry.placeholder_text().is_some() && entry.text().len() == 0 {
+            StringOption(Some(entry.placeholder_text().unwrap().to_string()))
+        } else if entry.text().len() > 0 {
+            StringOption(Some(entry.text().to_string()))
+        } else {
+            StringOption(None)
+        }
+    }
+}
+
+// Struct to wrap an Option<i32> so we can add traits to it
+struct I32Option(Option<i32>);
+impl From<&TemplateChild<Entry>> for I32Option {
+    fn from(entry: &TemplateChild<Entry>) -> Self {
+        if entry.placeholder_text().is_some() && entry.text().len() == 0 {
+            I32Option(Some(-1))
+        } else if entry.text().len() > 0 {
+            I32Option(Some(entry.text().parse::<i32>().expect("failed to parse i32")))
+        } else {
+            I32Option(None)
+        }
     }
 }
 
@@ -404,7 +346,7 @@ impl ArtButtonChangeNotifiable for MetanoteEditorPage {
     }
 }
 
-enum TagValue<'a> {
+enum EntryValue<'a> {
     Text(&'a Option<String>),
     Number(&'a Option<i32>),
 }
