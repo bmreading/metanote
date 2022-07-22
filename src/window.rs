@@ -43,7 +43,7 @@ mod imp {
     use super::*;
 
     #[derive(CompositeTemplate, Default)]
-    #[template(resource = "/com/github/bmreading/Metanote/window.ui")]
+    #[template(resource = "/com/gitlab/bmreading/Metanote/window.ui")]
     pub struct MetanoteApplicationWindow {
         pub file_chooser: FileChooserNative,
 

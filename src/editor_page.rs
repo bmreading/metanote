@@ -39,7 +39,7 @@ mod imp {
     use super::*;
 
     #[derive(CompositeTemplate, Default)]
-    #[template(resource = "/com/github/bmreading/Metanote/editor_page.ui")]
+    #[template(resource = "/com/gitlab/bmreading/Metanote/editor_page.ui")]
     pub struct MetanoteEditorPage {
         #[template_child]
         pub art_carousel: TemplateChild<Carousel>,

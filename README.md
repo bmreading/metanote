@@ -18,7 +18,7 @@ Until a release is made available, this is considered a work in progress.
 ### Using Meson
 
 ```
-git clone https://github.com/bmreading/metanote.git
+git clone https://gitlab.com/bmreading/metanote.git
 cd metanote
 meson --prefix=/usr build
 ninja -C build

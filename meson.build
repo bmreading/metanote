@@ -8,7 +8,7 @@ project(
 
 # Project-wide variables
 name        = 'Metanote'
-app_id      = 'com.github.bmreading.Metanote'
+app_id      = 'com.gitlab.bmreading.Metanote'
 version     = meson.project_version()
 authors     = 'Brian Reading <brian.reading@gmail.com>' # Separate authors by commas in string
 datadir     = join_paths(get_option('prefix'), get_option('datadir'))
