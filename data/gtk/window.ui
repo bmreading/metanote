@@ -13,7 +13,7 @@
         <property name="default-height">650</property>
         <child>
             <object class="AdwLeaflet" id="leaflet">
-                <property name="can-swipe-back">True</property>
+                <property name="can-navigate-back">True</property>
                 <property name="visible-child">main</property>
                 <child>
                     <object class="GtkBox">
