@@ -97,6 +97,7 @@ impl MetanoteApplication {
         let window = self.active_window().unwrap();
         let about_dialog = AboutDialog::builder()
             .program_name(NAME)
+            .logo_icon_name(APP_ID)
             .version(VERSION)
             .authors(AUTHORS.split(',').map(|a| a.to_string()).collect())
             .modal(true)
