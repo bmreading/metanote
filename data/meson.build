@@ -6,3 +6,5 @@ gnome.compile_resources(
     install: true,
     install_dir: pkgdatadir,
 )
+
+subdir('icons')
