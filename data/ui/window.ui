@@ -98,7 +98,7 @@
                             <object class="GtkStack" id="content_stack">
                                 <child>
                                     <object class="AdwStatusPage" id="status_page">
-                                        <property name="icon-name">library-music-symbolic</property>
+                                        <property name="icon-name">com.gitlab.bmreading.Metanote-symbolic</property>
                                         <property name="title" translatable="yes">Welcome to Metanote</property>
                                         <property name="description" translatable="yes">Open some audio tracks to begin.</property>
                                         <property name="valign">center</property>
