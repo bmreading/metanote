@@ -3,7 +3,5 @@
     <gresource prefix="/com/gitlab/bmreading/Metanote">
         <file alias="window.ui">ui/window.ui</file>
         <file alias="editor_page.ui">ui/editor_page.ui</file>
-        <file preprocess="xml-stripblanks">icons/music-queue-symbolic.svg</file>
-        <file preprocess="xml-stripblanks">icons/library-music-symbolic.svg</file>
     </gresource>
 </gresources>
