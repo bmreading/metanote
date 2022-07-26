@@ -1,7 +1,11 @@
 # Metanote
 
+<div align="center"><img src="./data/icons/hicolor/scalable/apps/com.gitlab.bmreading.Metanote.svg" alt="Metanote app icon" /></div>
+
 Metanote is a metadata editor for audio file formats. It is primarily targeted for the [GNOME platform](https://www.gnome.org).
 Until a release is made available, this is considered a work in progress.
+
+![Screenshot](./data/screenshots/metanote-1.png)
 
 ## Runtime dependencies
 
